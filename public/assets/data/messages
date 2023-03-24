@@ -1,0 +1,34 @@
+
+/*
+
+                  this.levelHints[22] = "Yellows, greens, then more yellows - that should take care of you...";
+                  this.levelHints[23] = "Did you know that the Greek national anthem has 136 verses?";
+                  this.levelHints[24] = "93% of American teenage girls say shopping is their favourite activity.";
+                  this.levelHints[25] = "Tack towers are really useful for thinning out the crowds - get the speed upgrade for extra effectiveness.";
+                  this.levelHints[26] = "Black bloons are nasty - they are small but contain 2 yellows inside them. Oh did I mention they are IMMUNE TO BOMBS?!";
+                  this.levelHints[27] = "When you sell a tower, you get 80% of what you paid for it, including all the upgrade money you spent.";
+                  this.levelHints[28] = "Lots and lots of yellows - more than a hundred even, followed by a bunch of black bloons.";
+                  this.levelHints[29] = "Next is a cash round - pop hundreds and hundreds of greens to top up your money. If you leak any I\'ll wince.";
+                  this.levelHints[30] = "Monkeys aren\'t so good at shooting at things moving to their left. Something about being right handed I guess.";
+                  this.levelHints[31] = "The good thing about black bloons is that they move slower than yellows.";
+                  this.levelHints[32] = "A - lot of yellows.";
+                  this.levelHints[33] = "10% of people lose their temper every day. If they play counterstrike its more like 90% I think...";
+                  this.levelHints[34] = "You will probably need to use every tower type to finish the game.";
+                  this.levelHints[35] = "You can improve frame rate a bit by having no towers selected during the round.";
+                  this.levelHints[36] = "Just black bloons coming up. Lots of \'em";
+                  this.levelHints[37] = "Just around the corner there are a throng of yellow bloons waiting to have a go...";
+                  this.levelHints[38] = "Just for fun, there are some of each colour bloon in the next level. Enjoy popping those easy reds for a change.";
+                  this.levelHints[39] = "80 blacks bloons. Enjoy.";
+                  this.levelHints[40] = "Its important to not lose early lives, because the levels are only getting harder.";
+                  this.levelHints[41] = "White bloons are IMMUNE TO FREEZING - and they also have 2 yellows inside them.";
+                  this.levelHints[42] = "How many monkeys does it take to make a super monkey? That stuff will keep you up at night.";
+                  this.levelHints[43] = "Lots and lots and lots of black bloons. More than ever.";
+                  this.levelHints[44] = "Lots and lots and lots of WHITE bloons. More than ever.";
+                  this.levelHints[45] = "Lots of white, then black, then yellow bloons. The next level is going to hurt.";
+                  this.levelHints[46] = "You still playing? I\'m impressed, I couldn\'t get this far without cheating.";
+                  this.levelHints[47] = "You got any super monkeys yet? Are they really worth all that money?";
+                  this.levelHints[48] = "Its ok if you don\'t pass this level. Really it is. Just hit \'try again\'. Its the effort that counts.";
+                  this.levelHints[49] = "This is the last level. There are TONS AND TONS of black AND white bloons coming. Hope you have lots of lives left...";
+               };
+
+*/
