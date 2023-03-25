@@ -18,6 +18,7 @@ export const towerUpgrades = {
       key: "faster-shooting",
       label: "Faster Shooting",
       cost: 250,
+      cooldown: 200,
     },
     {
       key: "extra-range-tacks",

@@ -15,6 +15,7 @@ export type Tower = {
   explodeRadius?: number;
   cost: number;
   upgrades: TowerUpgrade[];
+  pierce?: number;
 };
 
 export type TowerUpgrade = {
@@ -25,6 +26,7 @@ export type TowerUpgrade = {
   range?: number;
   explodeRadius?: number;
   freezeTime?: number;
+  cooldown?: number;
 };
 
 let nextId = 1;

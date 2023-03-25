@@ -9,6 +9,7 @@ import { TowerFired } from "./TowerFired";
 import { TowerPlacedEvent } from "./TowerPlaced";
 import { TowerSelectedEvent } from "./TowerSelected";
 import { TowerSoldEvent } from "./TowerSold";
+import { TowerUpgradedEvent } from "./TowerUpgraded";
 
 export type BaseEvent<
   Type extends string,
@@ -29,7 +30,8 @@ export type BTDEvent =
   | TowerSelectedEvent
   | TowerFired
   | ExplosionCreatedEvent
-  | TowerSoldEvent;
+  | TowerSoldEvent
+  | TowerUpgradedEvent;
 
 export type EventCallbackEntry = {
   id: EventCallbackId;

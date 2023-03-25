@@ -3,6 +3,7 @@ import { EventSystem } from "./events";
 import { TowerPlacedEvent } from "./events/types/TowerPlaced";
 import { TowerSelectedEvent } from "./events/types/TowerSelected";
 import { TowerSoldEvent } from "./events/types/TowerSold";
+import { TowerUpgradedEvent } from "./events/types/TowerUpgraded";
 import { KeyboardSystem } from "./keyboard";
 import { MoneySystem } from "./money";
 import { BoundingCircle, MouseSystem } from "./mouse";
@@ -17,6 +18,7 @@ import { TowerSystem } from "./towers";
 import { getTowerCost } from "./towers/cost";
 import { getTowerRange } from "./towers/range";
 import { getTowerSize } from "./towers/size";
+import { towerUpgrades } from "./towers/upgrades";
 
 export const createStoreSystem = ({
   moneySystem,
@@ -210,29 +212,75 @@ export const createStoreSystem = ({
     callback: () => handleTowerClicked("superMonkey"),
   });
 
+  const upgrade0 = getUpgradeButtonCoordinates(0);
+  const upgrade1 = getUpgradeButtonCoordinates(1);
+
   mouseSystem.hoverSubscribe({
-    box: getUpgradeButtonCoordinates(0),
+    box: upgrade0,
     type: "hover",
     in: () => {
-      console.log("in0");
       state.upgradeHover = 0;
     },
     out: () => {
-      console.log("out0");
       state.upgradeHover = -1;
     },
   });
 
+  mouseSystem.subscribe({
+    box: upgrade0,
+    type: "click",
+    callback: () => {
+      if (
+        !state.selectedTower ||
+        moneySystem.getMoney() <
+          towerUpgrades[state.selectedTower.type][0].cost ||
+        state.selectedTower.upgrades
+          .map((u) => u.key)
+          .includes(towerUpgrades[state.selectedTower.type][0].key)
+      )
+        return;
+      eventSystem.publish<TowerUpgradedEvent>({
+        type: "TowerUpgraded",
+        payload: {
+          tower: state.selectedTower,
+          upgrade: towerUpgrades[state.selectedTower.type][0],
+        },
+      });
+    },
+  });
+
   mouseSystem.hoverSubscribe({
-    box: getUpgradeButtonCoordinates(1),
+    box: upgrade1,
     type: "hover",
     in: () => {
-      console.log("in1");
       state.upgradeHover = 1;
     },
     out: () => {
-      console.log("out1");
       state.upgradeHover = -1;
+    },
+  });
+
+  mouseSystem.subscribe({
+    box: upgrade1,
+    type: "click",
+    callback: () => {
+      if (
+        !state.selectedTower ||
+        towerUpgrades[state.selectedTower.type].length < 2 ||
+        moneySystem.getMoney() <
+          towerUpgrades[state.selectedTower.type][1].cost ||
+        state.selectedTower.upgrades
+          .map((u) => u.key)
+          .includes(towerUpgrades[state.selectedTower.type][1].key)
+      )
+        return;
+      eventSystem.publish<TowerUpgradedEvent>({
+        type: "TowerUpgraded",
+        payload: {
+          tower: state.selectedTower,
+          upgrade: towerUpgrades[state.selectedTower.type][1],
+        },
+      });
     },
   });
 

@@ -5,8 +5,9 @@ import { TowerFired } from "../events/types/TowerFired";
 import { TowerPlacedEvent } from "../events/types/TowerPlaced";
 import { TowerSelectedEvent } from "../events/types/TowerSelected";
 import { TowerSoldEvent } from "../events/types/TowerSold";
+import { TowerUpgradedEvent } from "../events/types/TowerUpgraded";
 import { getTowerCooldown } from "./cooldown";
-import { getTowerRange } from "./range";
+import { getTowerRange, RANGE_MULTIPLIER } from "./range";
 import { getTowerSize } from "./size";
 
 export const createTowerSystem = ({
@@ -65,6 +66,26 @@ export const createTowerSystem = ({
     },
   });
 
+  eventSystem.subscribe<TowerUpgradedEvent>({
+    type: "TowerUpgraded",
+    callback: (event) => {
+      const tower = state.towers.find(
+        (tower) => tower.id === event.payload.tower.id
+      );
+      if (!tower) return;
+      tower.upgrades.push(event.payload.upgrade);
+      const upgrade = event.payload.upgrade;
+      if (upgrade.range) tower.range += upgrade.range * RANGE_MULTIPLIER;
+      if (upgrade.freezeTime)
+        tower.freezeTime = (tower.freezeTime || 0) + upgrade.freezeTime;
+      if (upgrade.explodeRadius)
+        tower.explodeRadius =
+          (tower.explodeRadius || 0) + upgrade.explodeRadius;
+      if (upgrade.pierce) tower.pierce = (tower.pierce || 0) + upgrade.pierce;
+      if (upgrade.cooldown) tower.cooldown -= upgrade.cooldown;
+    },
+  });
+
   return {
     getTowers: () => state.towers,
     update: (deltaTime: number) => {
@@ -78,6 +99,7 @@ export const createTowerSystem = ({
             radius: tower.range,
           });
           if (target) {
+            console.log("Firing tower", tower.id, tower.cooldown);
             tower.timeSinceFire = 0; // need to reset to 0 to prevent building up of shots
             tower.rotation = Math.atan2(
               target.y - tower.position.y,

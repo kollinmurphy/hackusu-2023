@@ -293,17 +293,24 @@ const renderSelectedTowerPane = ({
 
     context.fillStyle = "rgba(255, 255, 255, 0.8)";
     context.fillText(
-      purchased ? "Already purchased" : "Buy for:",
+      purchased ? "Already" : "Buy for:",
       xStart + (xSpacing + width) * i + width / 2,
       yStart + height - 40
     );
-
-    context.fillStyle = "white";
-    context.fillText(
-      purchased ? "" : upgrades[i].cost.toString(),
-      xStart + (xSpacing + width) * i + width / 2,
-      yStart + height - 40 + 25
-    );
+    if (purchased) {
+      context.fillText(
+        "Purchased",
+        xStart + (xSpacing + width) * i + width / 2,
+        yStart + height - 40 + 25
+      );
+    } else {
+      context.fillStyle = "white";
+      context.fillText(
+        purchased ? "" : upgrades[i].cost.toString(),
+        xStart + (xSpacing + width) * i + width / 2,
+        yStart + height - 40 + 25
+      );
+    }
   }
 
   context.restore();
