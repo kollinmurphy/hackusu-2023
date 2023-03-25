@@ -1,5 +1,6 @@
 import { createBloonSystem } from "../../systems/bloons";
 import { createEventSystem } from "../../systems/events";
+import { createLivesSystem } from "../../systems/livesSystem";
 import { createMoneySystem } from "../../systems/money";
 import { createMouseManager, MouseManager } from "../../systems/mouseInput";
 import { createPathSystem } from "../../systems/paths";
@@ -26,6 +27,7 @@ export const createGameplay = ({
   });
   const moneySystem = createMoneySystem({ eventSystem });
   const storeSystem = createStoreSystem({ moneySystem, mouseSystem });
+  const livesSystem = createLivesSystem({ eventSystem, bloonSystem });
   const renderSystem = createRenderSystem({
     bloonSystem,
     moneySystem,
@@ -34,6 +36,7 @@ export const createGameplay = ({
     storeSystem,
     pathSystem,
     roundSystem,
+    livesSystem,
   });
 
   return {

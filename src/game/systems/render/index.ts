@@ -1,4 +1,5 @@
 import { BloonSystem } from "../bloons";
+import { LivesSystem } from "../livesSystem";
 import { MoneySystem } from "../money";
 import { PathSystem } from "../paths";
 import { RoundSystem } from "../roundSystem";
@@ -15,6 +16,7 @@ export const createRenderSystem = ({
   context,
   canvas,
   roundSystem,
+  livesSystem,
 }: {
   bloonSystem: BloonSystem;
   moneySystem: MoneySystem;
@@ -23,13 +25,21 @@ export const createRenderSystem = ({
   canvas: HTMLCanvasElement;
   pathSystem: PathSystem;
   roundSystem: RoundSystem;
+  livesSystem: LivesSystem;
 }) => {
   return {
     render: () => {
       renderMap({ context, canvas, pathSystem });
       for (const bloon of bloonSystem.getBloons())
         renderBloon({ bloon, context });
-      renderStore({ context, canvas, storeSystem, moneySystem, roundSystem });
+      renderStore({
+        context,
+        canvas,
+        storeSystem,
+        moneySystem,
+        roundSystem,
+        livesSystem,
+      });
     },
   };
 };

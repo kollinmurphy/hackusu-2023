@@ -23,15 +23,15 @@ export const createRoundSystem = ({
 
   const handleCheckStageCleared = () => {
     if (bloonSystem.getBloons().length === 0) {
-      state.round += 1;
-      state.active = false;
       eventSystem.publish<StageClearedEvent>({
         type: "StageCleared",
         payload: {
           stage: state.round,
-          message: rounds.rounds[state.round - 1].message,
+          message: rounds.rounds[state.round].message,
         },
       });
+      state.round += 1;
+      state.active = false;
     }
   };
 

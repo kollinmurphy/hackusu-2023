@@ -7,7 +7,7 @@ export const createMoneySystem = ({
 }: {
   eventSystem: EventSystem;
 }) => {
-  let money = 0;
+  let money = 1000;
 
   eventSystem.subscribe<BloonPoppedEvent>({
     type: "BloonPopped",
@@ -19,7 +19,7 @@ export const createMoneySystem = ({
   eventSystem.subscribe<StageClearedEvent>({
     type: "StageCleared",
     callback: (event) => {
-      money += Math.min(0, 100 - event.payload.stage);
+      money += Math.max(0, 100 - (event.payload.stage - 1));
     },
   });
 

@@ -142,12 +142,19 @@ export const createBloonSystem = ({
 
   return {
     getBloons: () => state.bloons,
+    getBloon: (id: BloonId) => {
+      return state.bloons.find((bloon) => bloon.id === id);
+    },
     update: (deltaTime: number) => {
       if (!state.active) return;
 
       state.bloonTime += deltaTime;
       if (state.bloonTime > BLOON_INTERVAL) {
-        const next = getNextBloon(state.round, state.bloonsCreated, createBloonId(nextId++));
+        const next = getNextBloon(
+          state.round,
+          state.bloonsCreated,
+          createBloonId(nextId++)
+        );
         if (next) {
           state.bloonTime -= BLOON_INTERVAL;
           state.bloons.push(next);
