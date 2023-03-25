@@ -1,5 +1,7 @@
 import { TowerType } from "../../types/Tower";
 
+export const RANGE_MULTIPLIER = 1.75;
+
 export const getTowerRange = (type: TowerType) => {
   const value = (() => {
     switch (type) {
@@ -10,10 +12,10 @@ export const getTowerRange = (type: TowerType) => {
       case "tack":
         return 70;
       case "ice":
-        return 70; //?
+        return 50; //?
       case "superMonkey":
-        return 150;
+        return 140;
     }
   })();
-  return value * 2;
+  return value * RANGE_MULTIPLIER;
 };

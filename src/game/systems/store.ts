@@ -220,6 +220,7 @@ export const createStoreSystem = ({
           tower: state.selectedTower,
         },
       });
+      state.selectedTower = null;
     }
   })
 

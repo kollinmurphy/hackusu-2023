@@ -4,6 +4,7 @@ import { EventSystem } from "../events";
 import { TowerFired } from "../events/types/TowerFired";
 import { TowerPlacedEvent } from "../events/types/TowerPlaced";
 import { TowerSelectedEvent } from "../events/types/TowerSelected";
+import { TowerSoldEvent } from "../events/types/TowerSold";
 import { getTowerCooldown } from "./cooldown";
 import { getTowerRange } from "./range";
 import { getTowerSize } from "./size";
@@ -51,6 +52,15 @@ export const createTowerSystem = ({
     type: "TowerSelected",
     callback: (event) => {
       state.selectedTower = event.payload.tower;
+    },
+  });
+
+  eventSystem.subscribe<TowerSoldEvent>({
+    type: "TowerSold",
+    callback: (event) => {
+      state.towers = state.towers.filter(
+        (tower) => tower.id !== event.payload.tower.id
+      );
     },
   });
 

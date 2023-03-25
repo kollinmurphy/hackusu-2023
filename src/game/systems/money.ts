@@ -2,6 +2,8 @@ import { EventSystem } from "./events";
 import { BloonPoppedEvent } from "./events/types/BloonPopped";
 import { StageClearedEvent } from "./events/types/StageCleared";
 import { TowerPlacedEvent } from "./events/types/TowerPlaced";
+import { TowerSoldEvent } from "./events/types/TowerSold";
+import { getSellPrice } from "./towers/sellPrice";
 
 export const createMoneySystem = ({
   eventSystem,
@@ -29,6 +31,13 @@ export const createMoneySystem = ({
     type: "TowerPlaced",
     callback: (event) => {
       money -= event.payload.cost;
+    },
+  });
+
+  eventSystem.subscribe<TowerSoldEvent>({
+    type: "TowerSold",
+    callback: (event) => {
+      money += getSellPrice(event.payload.tower.cost);
     },
   });
 

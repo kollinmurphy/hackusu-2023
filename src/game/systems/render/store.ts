@@ -4,6 +4,9 @@ import { RoundSystem } from "../round";
 import { StoreSystem } from "../store";
 import { Textures } from "../textures";
 import { getTowerName } from "../towers/name";
+import { RANGE_MULTIPLIER } from "../towers/range";
+import { getSellPrice } from "../towers/sellPrice";
+import { getSpeedLabel } from "../towers/speedLabel";
 import { renderTower } from "./tower";
 
 export const getStoreStartX = () => 780;
@@ -207,7 +210,7 @@ const renderSelectedTowerPane = ({
   context.globalAlpha = 1;
 
   context.fillStyle = `#056105`;
-  context.font = "28px TrebuchetMS";
+  context.font = "24px TrebuchetMS";
   context.fillText(getTowerName(tower.type), 912, 380);
 
   context.strokeStyle = `#056105`;
@@ -216,6 +219,14 @@ const renderSelectedTowerPane = ({
   context.moveTo(820, 390);
   context.lineTo(1004, 390);
   context.stroke();
+
+  context.textAlign = "left";
+  context.fillText("Speed:", 810, 430);
+  context.fillText("Range:", 810, 480);
+
+  context.textAlign = "right";
+  context.fillText(getSpeedLabel(tower.cooldown), 1014, 430);
+  context.fillText((tower.range / RANGE_MULTIPLIER).toString(), 1014, 480);
 
   context.fillStyle = `#A94A2E`;
   context.beginPath();
@@ -237,7 +248,7 @@ const renderSelectedTowerPane = ({
   context.fillStyle = "white";
   context.font = "24px TrebuchetMS";
   context.textAlign = "right";
-  context.fillText(tower.cost.toString(), 994, 830);
+  context.fillText(getSellPrice(tower.cost).toString(), 994, 830);
 
   context.restore();
 };
