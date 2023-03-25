@@ -5,8 +5,8 @@
       "message": "",
       "bloons": [
         {
-          "type": "green",
-          "count": 1
+          "type": "red",
+          "count": 12
         }
       ]
     },
