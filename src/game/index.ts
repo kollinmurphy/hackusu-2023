@@ -21,7 +21,7 @@ export const createGame = ({
     },
     render: () => {
       context.clearRect(0, 0, canvas.width, canvas.height);
-      context.fillStyle = "#6495ed";
+      context.fillStyle = "#aaa";
       context.fillRect(0, 0, canvas.width, canvas.height);
       state.screen.render();
     },

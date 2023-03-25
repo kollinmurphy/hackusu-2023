@@ -9,6 +9,7 @@ export type Tower = {
   rotation: number;
   range: number;
   cooldown: number;
+  animation: number;
 };
 
 let nextId = 1;

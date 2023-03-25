@@ -5,7 +5,7 @@ import { BloonEscapedEvent } from "./events/types/BloonEscaped";
 import { BloonPoppedEvent } from "./events/types/BloonPopped";
 import { StageClearedEvent } from "./events/types/StageCleared";
 import { StageStartedEvent } from "./events/types/StageStarted";
-import { MouseSystem } from "./mouseSystem";
+import { MouseSystem } from "./mouse";
 
 const ANIMATION_LENGTH = 1000;
 
@@ -60,6 +60,7 @@ export const createRoundSystem = ({
       });
     },
     box: {
+      type: "box",
       x: 800,
       y: 880,
       width: 224,

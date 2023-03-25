@@ -1,7 +1,6 @@
-import { LivesSystem } from "../livesSystem";
+import { LivesSystem } from "../lives";
 import { MoneySystem } from "../money";
-import { PathSystem } from "../paths";
-import { RoundSystem } from "../roundSystem";
+import { RoundSystem } from "../round";
 import { StoreSystem } from "../store";
 import { Textures } from "../textures";
 import { getTowerSize } from "../towers/size";
@@ -58,25 +57,17 @@ const renderTowerIcons = ({
 
 const renderPlacingTower = ({
   storeSystem,
-  pathSystem,
+  canPlace,
   context,
-  canvas,
 }: {
   storeSystem: StoreSystem;
   context: CanvasRenderingContext2D;
-  pathSystem: PathSystem;
-  canvas: HTMLCanvasElement;
+  canPlace: boolean;
 }) => {
   const tower = storeSystem.getPlacingTowerDetails();
   if (!tower) return;
 
   const size = getTowerSize(tower.type);
-  const canPlace = pathSystem.canPlaceTower({
-    x: tower.position.x,
-    y: tower.position.y,
-    canvas,
-    ...size,
-  });
   context.save();
   context.fillStyle = canPlace
     ? "rgba(0, 255, 0, 0.5)"
@@ -106,7 +97,7 @@ export const renderStore = ({
   moneySystem,
   roundSystem,
   livesSystem,
-  pathSystem,
+  canPlaceTower,
 }: {
   context: CanvasRenderingContext2D;
   canvas: HTMLCanvasElement;
@@ -114,7 +105,7 @@ export const renderStore = ({
   moneySystem: MoneySystem;
   roundSystem: RoundSystem;
   livesSystem: LivesSystem;
-  pathSystem: PathSystem;
+  canPlaceTower: boolean;
 }) => {
   context.save();
   context.fillStyle = "rgba(255, 255, 255, 0.5)";
@@ -170,7 +161,7 @@ export const renderStore = ({
   }
 
   renderTowerIcons({ context });
-  renderPlacingTower({ context, storeSystem, pathSystem, canvas });
+  renderPlacingTower({ context, storeSystem, canPlace: canPlaceTower });
 
   context.restore();
 };

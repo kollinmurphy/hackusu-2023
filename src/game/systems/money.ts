@@ -1,13 +1,15 @@
 import { EventSystem } from "./events";
 import { BloonPoppedEvent } from "./events/types/BloonPopped";
 import { StageClearedEvent } from "./events/types/StageCleared";
+import { TowerPlacedEvent } from "./events/types/TowerPlaced";
 
 export const createMoneySystem = ({
   eventSystem,
 }: {
   eventSystem: EventSystem;
 }) => {
-  let money = 1000;
+  // let money = 1000;
+  let money = 1000000;
 
   eventSystem.subscribe<BloonPoppedEvent>({
     type: "BloonPopped",
@@ -20,6 +22,13 @@ export const createMoneySystem = ({
     type: "StageCleared",
     callback: (event) => {
       money += Math.max(0, 100 - (event.payload.stage - 1));
+    },
+  });
+
+  eventSystem.subscribe<TowerPlacedEvent>({
+    type: "TowerPlaced",
+    callback: (event) => {
+      money -= event.payload.cost;
     },
   });
 

@@ -1,18 +1,31 @@
 import { createTowerId, Tower, TowerType } from "../types/Tower";
-import { KeyboardSystem } from "./keyboardSystem";
+import { EventSystem } from "./events";
+import { TowerPlacedEvent } from "./events/types/TowerPlaced";
+import { KeyboardSystem } from "./keyboard";
 import { MoneySystem } from "./money";
-import { MouseSystem } from "./mouseSystem";
-import { getTowerIconDetails } from "./render/store";
+import { BoundingCircle, MouseSystem } from "./mouse";
+import { PathSystem } from "./paths";
+import { getStoreStartX, getTowerIconDetails } from "./render/store";
+import { TowerSystem } from "./towers";
 import { getTowerCost } from "./towers/cost";
+import { getTowerSize } from "./towers/size";
 
 export const createStoreSystem = ({
   moneySystem,
   mouseSystem,
   keyboardSystem,
+  eventSystem,
+  canvas,
+  pathSystem,
+  towerSystem,
 }: {
   moneySystem: MoneySystem;
   mouseSystem: MouseSystem;
   keyboardSystem: KeyboardSystem;
+  eventSystem: EventSystem;
+  canvas: HTMLCanvasElement;
+  pathSystem: PathSystem;
+  towerSystem: TowerSystem;
 }) => {
   const state: {
     placingTower: Tower | null;
@@ -28,32 +41,22 @@ export const createStoreSystem = ({
     dartMonkey: {
       x: buttonDetails.x,
       y: buttonDetails.y,
-      width: buttonDetails.size,
-      height: buttonDetails.size,
     },
     tackTower: {
       x: buttonDetails.x + buttonDetails.each,
       y: buttonDetails.y,
-      width: buttonDetails.size,
-      height: buttonDetails.size,
     },
     iceTower: {
       x: buttonDetails.x + buttonDetails.each * 2,
       y: buttonDetails.y,
-      width: buttonDetails.size,
-      height: buttonDetails.size,
     },
     bombTower: {
       x: buttonDetails.x + buttonDetails.each * 3,
       y: buttonDetails.y,
-      width: buttonDetails.size,
-      height: buttonDetails.size,
     },
     superMonkey: {
       x: buttonDetails.x + buttonDetails.each * 4,
       y: buttonDetails.y,
-      width: buttonDetails.size,
-      height: buttonDetails.size,
     },
   };
 
@@ -64,13 +67,64 @@ export const createStoreSystem = ({
     },
   });
 
+  mouseSystem.subscribe({
+    type: "click",
+    box: {
+      type: "box",
+      x: 0,
+      y: 0,
+      width: getStoreStartX(),
+      height: canvas.height,
+    },
+    callback: (x, y) => {
+      if (!state.placingTower) return;
+      const size = getTowerSize(state.placingTower?.type ?? "dartMonkey");
+      if (
+        !pathSystem.canPlaceTower({
+          x,
+          y,
+          width: size.width,
+          height: size.height,
+          canvas,
+        }) ||
+        !towerSystem.canPlaceTower({
+          x,
+          y,
+          width: size.width,
+          height: size.height,
+        })
+      )
+        return;
+
+      const cost = getTowerCost(state.placingTower.type);
+      if (moneySystem.getMoney() >= cost) {
+        eventSystem.publish<TowerPlacedEvent>({
+          type: "TowerPlaced",
+          payload: {
+            type: state.placingTower.type,
+            x,
+            y,
+            cost,
+          },
+        });
+      }
+    },
+  });
+
   keyboardSystem.subscribe({
     key: "exit",
     callback: () => {
-      console.log("ESCAPE")
+      console.log("ESCAPE");
       state.placingTower = null;
     },
     type: "keydown",
+  });
+
+  eventSystem.subscribe<TowerPlacedEvent>({
+    type: "TowerPlaced",
+    callback: () => {
+      state.placingTower = null;
+    },
   });
 
   const handleTowerClicked = (tower: TowerType) => {
@@ -87,14 +141,49 @@ export const createStoreSystem = ({
         id: createTowerId(),
         range: 0,
         rotation: 0,
+        animation: 0,
       };
     }
   };
 
+  const createBoundingCircle = (box: {
+    x: number;
+    y: number;
+  }): BoundingCircle => ({
+    x: box.x + buttonDetails.size / 2,
+    y: box.y + buttonDetails.size / 2,
+    type: "circle",
+    radius: buttonDetails.size / 2,
+  });
+
   mouseSystem.subscribe({
-    box: boxes.dartMonkey,
+    box: createBoundingCircle(boxes.dartMonkey),
     type: "click",
     callback: () => handleTowerClicked("dartMonkey"),
+  });
+
+  mouseSystem.subscribe({
+    box: createBoundingCircle(boxes.tackTower),
+    type: "click",
+    callback: () => handleTowerClicked("tack"),
+  });
+
+  mouseSystem.subscribe({
+    box: createBoundingCircle(boxes.iceTower),
+    type: "click",
+    callback: () => handleTowerClicked("ice"),
+  });
+
+  mouseSystem.subscribe({
+    box: createBoundingCircle(boxes.bombTower),
+    type: "click",
+    callback: () => handleTowerClicked("bomb"),
+  });
+
+  mouseSystem.subscribe({
+    box: createBoundingCircle(boxes.superMonkey),
+    type: "click",
+    callback: () => handleTowerClicked("superMonkey"),
   });
 
   return {
@@ -104,6 +193,10 @@ export const createStoreSystem = ({
         ...state.placingTower,
         position: state.position,
       };
+    },
+    update: (deltaTime: number) => {
+      if (!state.placingTower) return;
+      state.placingTower.animation += deltaTime;
     },
   };
 };

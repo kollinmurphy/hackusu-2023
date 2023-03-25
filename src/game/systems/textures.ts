@@ -54,7 +54,9 @@ export type TextureMap = {
       base: HTMLImageElement;
       barrel: HTMLImageElement;
     };
-    dartMonkey: HTMLImageElement;
+    dartMonkey: {
+      base: HTMLImageElement;
+    };
     ice: {
       border: HTMLImageElement;
       orb: HTMLImageElement;
@@ -62,10 +64,10 @@ export type TextureMap = {
     };
     superMonkey: {
       base: HTMLImageElement;
-      monkey: HTMLImageElement;
     };
     tack: {
       orb: HTMLImageElement;
+      orb2: HTMLImageElement;
       base: HTMLImageElement;
       tack: HTMLImageElement;
     };
@@ -140,7 +142,6 @@ export const initializeTextures = async () => {
     towerIceBorder,
     towerIceOrb,
     towerIceSnowflake,
-    towerSuperMonkeyBase,
     towerSuperMonkey,
     towerTackOrb,
     towerTackBase,
@@ -150,6 +151,7 @@ export const initializeTextures = async () => {
     shopIceTower,
     shopSuperMonkey,
     shopTackTower,
+    towerTackOrb2,
   ] = await Promise.all(
     [
       "bloons/red.svg",
@@ -194,12 +196,11 @@ export const initializeTextures = async () => {
       "text/try-again1.svg",
       "towers/bomb-base.svg",
       "towers/bomb-barrel.svg",
-      "towers/dart-monkey.svg",
+      "towers/dart-monkey-base.svg",
       "towers/ice-border.svg",
       "towers/ice-orb.svg",
       "towers/ice-snowflake.svg",
       "towers/super-monkey-base.svg",
-      "towers/super-monkey.svg",
       "towers/tack-orb.svg",
       "towers/tack-base.svg",
       "towers/tack.svg",
@@ -208,6 +209,7 @@ export const initializeTextures = async () => {
       "shop/ice-tower.svg",
       "shop/super-monkey.svg",
       "shop/tack-shooter.svg",
+      "towers/tack-orb2.svg",
     ].map((src) => loadTexture(`./assets/${src}`))
   ).catch((error) => {
     console.error(error);
@@ -273,20 +275,22 @@ export const initializeTextures = async () => {
         base: towerBombBase,
         barrel: towerBombBarrel,
       },
-      dartMonkey: towerDartMonkey,
+      dartMonkey: {
+        base: towerDartMonkey,
+      },
       ice: {
         border: towerIceBorder,
         orb: towerIceOrb,
         snowflake: towerIceSnowflake,
       },
       superMonkey: {
-        base: towerSuperMonkeyBase,
-        monkey: towerSuperMonkey,
+        base: towerSuperMonkey,
       },
       tack: {
         base: towerTackBase,
         orb: towerTackOrb,
         tack: towerTack,
+        orb2: towerTackOrb2,
       },
     },
     shop: {

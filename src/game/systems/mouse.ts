@@ -4,9 +4,13 @@ type MouseEvent = "hover-in" | "hover-out" | "click" | "move";
 
 type MouseListener = {
   key: MouseCallbackId;
-  box: BoundingBox;
+  box: (BoundingBox & { type: "box" }) | BoundingCircle;
   type: MouseEvent;
   callback: () => void;
+};
+
+type ClickListener = Omit<MouseListener, "callback"> & {
+  callback: (x: number, y: number) => void;
 };
 
 type MoveListener = Omit<MouseListener, "box" | "callback"> & {
@@ -20,6 +24,13 @@ export type BoundingBox = {
   height: number;
 };
 
+export type BoundingCircle = {
+  type: "circle";
+  x: number;
+  y: number;
+  radius: number;
+};
+
 const createCallbackId = (num: number) => num as MouseCallbackId;
 
 export const createMouseSystem = ({
@@ -29,7 +40,7 @@ export const createMouseSystem = ({
 }) => {
   const hoverIn: MouseListener[] = [];
   const hoverOut: MouseListener[] = [];
-  const click: MouseListener[] = [];
+  const click: ClickListener[] = [];
   const move: MoveListener[] = [];
 
   let backlog: VoidFunction[] = [];
@@ -37,7 +48,7 @@ export const createMouseSystem = ({
 
   let nextId = 1;
 
-  let points: { x: number; y: number }[] = [];
+  // let points: { x: number; y: number }[] = [];
 
   const convertScreenToCanvasCoordinates = (x: number, y: number) => {
     const rect = canvas.getBoundingClientRect();
@@ -52,35 +63,44 @@ export const createMouseSystem = ({
     lastMove = { x, y };
   };
 
-  const outputInfoToConsole = () => {
-    if (points.length % 2 !== 0) return;
-    const boxes = [];
-    for (let i = 0; i < points.length; i += 2) {
-      boxes.push({
-        x: Math.round(points[i].x),
-        y: Math.round(points[i].y),
-        width: Math.round(points[i + 1].x - points[i].x),
-        height: Math.round(points[i + 1].y - points[i].y),
-      });
-    }
-    const stringified = JSON.stringify(boxes);
-    console.log(stringified.substring(1, stringified.length - 1));
-  };
+  // const outputInfoToConsole = () => {
+  //   if (points.length % 2 !== 0) return;
+  //   const boxes = [];
+  //   for (let i = 0; i < points.length; i += 2) {
+  //     boxes.push({
+  //       x: Math.round(points[i].x),
+  //       y: Math.round(points[i].y),
+  //       width: Math.round(points[i + 1].x - points[i].x),
+  //       height: Math.round(points[i + 1].y - points[i].y),
+  //     });
+  //   }
+  //   const stringified = JSON.stringify(boxes);
+  //   console.log(stringified.substring(1, stringified.length - 1));
+  // };
 
   const clickHandler = (e: globalThis.MouseEvent) => {
     const { x, y } = convertScreenToCanvasCoordinates(e.clientX, e.clientY);
     console.log(`click at ${x}, ${y}`);
-    points.push({ x, y });
-    outputInfoToConsole();
+    // points.push({ x, y });
+    // outputInfoToConsole();
     for (let i = 0; i < click.length; i++) {
       const { box, callback } = click[i];
-      if (
-        x >= box.x &&
-        x <= box.x + box.width &&
-        y >= box.y &&
-        y <= box.y + box.height
-      )
-        backlog.push(callback);
+      if (box.type === "box") {
+        if (
+          x >= box.x &&
+          x <= box.x + box.width &&
+          y >= box.y &&
+          y <= box.y + box.height
+        )
+          backlog.push(() => callback(x, y));
+      } else {
+        if (
+          Math.sqrt(Math.pow(box.x - x, 2) + Math.pow(box.y - y, 2)) <=
+          box.radius
+        ) {
+          backlog.push(() => callback(x, y));
+        }
+      }
     }
   };
 
@@ -101,9 +121,14 @@ export const createMouseSystem = ({
     subscribe: (
       props:
         | {
-            type: "hover-in" | "hover-out" | "click";
+            type: "hover-in" | "hover-out";
             callback: () => void;
             box: BoundingBox;
+          }
+        | {
+            type: "click";
+            callback: (x: number, y: number) => void;
+            box: (BoundingBox & { type: "box" }) | BoundingCircle;
           }
         | {
             type: "move";
@@ -126,13 +151,13 @@ export const createMouseSystem = ({
         };
         switch (props.type) {
           case "hover-in":
-            hoverIn.push(listener);
+            hoverIn.push(listener as any);
             break;
           case "hover-out":
-            hoverOut.push(listener);
+            hoverOut.push(listener as any);
             break;
           case "click":
-            click.push(listener);
+            click.push(listener as any);
             break;
         }
       }
