@@ -27,6 +27,8 @@ export const createTacks = ({ tower }: { tower: Tower }): Projectile[] => {
       range: 100,
       elapsed: 0,
       type: tower.type,
+      pierce: tower.pierce || 0,
+      pierced: 0,
     });
   }
 

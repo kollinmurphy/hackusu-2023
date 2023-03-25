@@ -51,6 +51,8 @@ export const createBomb = ({
       elapsed: 0,
       type: tower.type,
       explodeRadius: tower.explodeRadius,
+      pierce: tower.pierce || 0,
+      pierced: 0,
     },
   ];
 };

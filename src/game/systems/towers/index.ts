@@ -99,7 +99,6 @@ export const createTowerSystem = ({
             radius: tower.range,
           });
           if (target) {
-            console.log("Firing tower", tower.id, tower.cooldown);
             tower.timeSinceFire = 0; // need to reset to 0 to prevent building up of shots
             tower.rotation = Math.atan2(
               target.y - tower.position.y,

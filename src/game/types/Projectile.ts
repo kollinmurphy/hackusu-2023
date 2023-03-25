@@ -20,4 +20,6 @@ export type Projectile = {
   elapsed: number;
   freezeTime?: number;
   explodeRadius?: number;
+  pierce: number;
+  pierced: number;
 };

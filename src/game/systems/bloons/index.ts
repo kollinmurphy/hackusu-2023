@@ -173,7 +173,13 @@ export const createBloonSystem = ({
       return null;
     },
     getBloons: () => state.bloons,
-    isComplete: () => state.bloons.length === 0 && state.finishedSpawning,
+    isComplete: () => {
+      console.log({
+        bloons: state.bloons.length,
+        finishedSpawning: state.finishedSpawning,
+      });
+      return state.bloons.length === 0 && state.finishedSpawning;
+    },
     getBloon: (id: BloonId) => {
       return state.bloons.find((bloon) => bloon.id === id);
     },
@@ -195,6 +201,15 @@ export const createBloonSystem = ({
             type: "BloonCreated",
             payload: next,
           });
+          const nextNext = getNextBloon(
+            state.round,
+            state.bloonsCreated,
+            createBloonId(nextId++)
+          );
+          if (!nextNext) {
+            state.finishedSpawning = true;
+            state.bloonTime = -Infinity;
+          }
         } else {
           state.bloonTime = -Infinity;
           state.finishedSpawning = true;
