@@ -9,6 +9,8 @@ export type Bloon = {
   frozenTime: number;
   frozenDuration: number;
   distance: number;
+  x: number;
+  y: number;
 }
 
 export const createBloonId = (num: number) => num as BloonId;

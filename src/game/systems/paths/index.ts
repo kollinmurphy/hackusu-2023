@@ -6,3 +6,5 @@ export const createPathSystem = ({ type }: { type: "original" }) => {
       return createOriginalPath();
   }
 };
+
+export type PathSystem = ReturnType<typeof createPathSystem>;

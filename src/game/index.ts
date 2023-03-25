@@ -16,7 +16,9 @@ export const createGame = ({
   };
 
   return {
-    update: () => {},
+    update: (deltaTime) => {
+      state.screen.update(deltaTime);
+    },
     render: () => {
       context.clearRect(0, 0, canvas.width, canvas.height);
       context.fillStyle = "#6495ed";

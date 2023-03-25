@@ -1,4 +1,8 @@
+import { createBloonSystem } from "../../systems/bloons";
+import { createEventSystem } from "../../systems/events";
+import { createMoneySystem } from "../../systems/money";
 import { createPathSystem } from "../../systems/paths";
+import { createRenderSystem } from "../../systems/render";
 import { Textures } from "../../systems/textures";
 import { GameView } from "../../types/GameView";
 
@@ -11,17 +15,26 @@ export const createGameplay = ({
 }): GameView => {
   const textures = Textures();
 
-  const path = createPathSystem({ type: "original" });
+  const eventSystem = createEventSystem();
+  const pathSystem = createPathSystem({ type: "original" });
+  const moneySystem = createMoneySystem({ eventSystem });
+  const bloonSystem = createBloonSystem({ eventSystem, pathSystem });
+  const renderSystem = createRenderSystem({
+    bloonSystem,
+    moneySystem,
+    context,
+    canvas,
+  });
 
   return {
     update: (deltaTime) => {
-      console.log("Gameplay update", deltaTime);
+      bloonSystem.update(deltaTime);
     },
     render: () => {
       const gap = canvas.width * 0.1;
       context.save();
 
-      path.tiles.forEach((tile) => {
+      pathSystem.tiles.forEach((tile) => {
         context.save();
         context.translate(tile.x, tile.y);
         if (tile.orientation === "vertical") {
@@ -56,6 +69,8 @@ export const createGameplay = ({
         canvas.height * 0.965
       );
       context.restore();
+
+      renderSystem.render();
     },
   };
 };
