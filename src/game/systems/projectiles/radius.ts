@@ -7,6 +7,8 @@ export const getProjectileRadius = (type: TowerType) => {
       return 40;
     case "tack":
       return 20;
+    case "bomb":
+      return 45;
     default:
       return 0;
   }

@@ -4,6 +4,7 @@ import { EventSystem } from "../events";
 import { BloonHitEvent } from "../events/types/BloonHit";
 import { TowerFired } from "../events/types/TowerFired";
 import { PathSystem } from "../paths";
+import { createBomb } from "./bomb";
 import { createDart } from "./darts";
 import { createIceRing, ICE_SPREAD_RATE } from "./ice";
 import { getProjectileRadius } from "./radius";
@@ -37,6 +38,8 @@ export const createProjectileSystem = ({
             return createTacks({ tower });
           case "ice":
             return createIceRing({ tower });
+          case "bomb":
+            return createBomb({ tower, pathSystem, bloon });
           default:
             return [];
         }
