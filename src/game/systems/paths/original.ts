@@ -1,7 +1,5 @@
 import { Path } from "./types";
 
-
-
 export const createOriginalPath = (): Path => {
   return {
     key: "original",
@@ -256,98 +254,84 @@ export const createOriginalPath = (): Path => {
       const segment13 = segment12 + 160;
 
       if (distance < segment0) {
-        console.log("segment0")
         return {
           completed: false,
           x: distance,
           y: 405,
         };
       } else if (distance < segment1) {
-        console.log("segment1")
         return {
           completed: false,
           x: 150,
           y: 405 - (distance - segment0),
-        }
+        };
       } else if (distance < segment2) {
-        console.log("segment2")
         return {
           completed: false,
           x: 150 + (distance - segment1),
           y: 155,
-        }
+        };
       } else if (distance < segment3) {
-        console.log("segment3")
         return {
           completed: false,
           x: 330,
           y: 155 + (distance - segment2),
-        }
+        };
       } else if (distance < segment4) {
-        console.log("segment4")
         return {
           completed: false,
           x: 330 - (distance - segment3),
           y: 660,
-        }
+        };
       } else if (distance < segment5) {
-        console.log("segment5")
         return {
           completed: false,
           x: 330 - 250,
           y: 660 + (distance - segment4),
-        }
+        };
       } else if (distance < segment6) {
-        console.log("segment6")
         return {
           completed: false,
           x: 80 + (distance - segment5),
           y: 660 + 170,
-        }
+        };
       } else if (distance < segment7) {
-        console.log("segment7")
         return {
           completed: false,
           x: 80 + 600,
           y: 660 + 170 - (distance - segment6),
-        }
+        };
       } else if (distance < segment8) {
-        console.log("segment8")
         return {
           completed: false,
           x: 80 + 600 - (distance - segment7),
           y: 660 + 170 - 275,
-        }
+        };
       } else if (distance < segment9) {
-        console.log("segment9")
         return {
           completed: false,
           x: 80 + 600 - 185,
           y: 660 + 170 - 275 - (distance - segment8),
-        }
+        };
       } else if (distance < segment10) {
-        console.log("segment10")
         return {
           completed: false,
           x: 80 + 600 - 185 + (distance - segment9),
           y: 660 + 170 - 275 - 225,
-        }
+        };
       } else if (distance < segment11) {
-        console.log("segment11")
         return {
           completed: false,
           x: 80 + 600 - 185 + 195,
           y: 660 + 170 - 275 - 225 - (distance - segment10),
-        }
+        };
       } else if (distance < segment12) {
-        console.log("segment12")
         return {
           completed: false,
           x: 690 - (distance - segment11),
           y: 60,
         };
       } else if (distance < segment13) {
-        console.log("segment13")
         return {
           completed: false,
           x: 430,
@@ -358,12 +342,10 @@ export const createOriginalPath = (): Path => {
           completed: true,
           x: 430,
           y: -100,
-        }
+        };
       }
 
-
       // 80 + 600 - 250
-
     },
   };
 };

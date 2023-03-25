@@ -1,98 +1,144 @@
-import { getFromStorage, saveToStorage } from "../localStorage";
-
 export type MouseCallbackId = number & { __mouseCallbackId: void };
 
-type MouseEvent = "hover-in" | "hover-out" | "click";
+type MouseEvent = "hover-in" | "hover-out" | "click" | "move";
 
-type MouseMapEntry = {
+type MouseListener = {
   key: MouseCallbackId;
+  box: BoundingBox;
   type: MouseEvent;
   callback: () => void;
 };
 
+type MoveListener = Omit<MouseListener, "box" | "callback"> & {
+  callback: (x: number, y: number) => void;
+};
+
+type BoundingBox = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
 const createCallbackId = (num: number) => num as MouseCallbackId;
 
-export const createMouseManager = () => {
-  const hoverInCallbacks = new Map<HTMLElement, MouseMapEntry[]>();
+export const createMouseManager = ({
+  canvas,
+}: {
+  canvas: HTMLCanvasElement;
+}) => {
+  const hoverIn: MouseListener[] = [];
+  const hoverOut: MouseListener[] = [];
+  const click: MouseListener[] = [];
+  const move: MoveListener[] = [];
 
-  const keydownKeys = new Set<Key>();
-  const repeatKeys = new Set<Key>();
-  const keyupKeys = new Set<Key>();
+  let backlog: VoidFunction[] = [];
+  let lastMove: { x: number; y: number } | null = null;
 
   let nextId = 1;
 
-  const keydownListener = (event: KeyboardEvent) => {
-    if (event.repeat) return;
-    const key = mapKey(event.key, keyMapping);
-    if (!key) return;
-    keydownKeys.add(key);
+  const convertScreenToCanvasCoordinates = (x: number, y: number) => {
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: (x - rect.left) / (rect.right - rect.left) * canvas.width,
+      y: (y - rect.top) / (rect.bottom - rect.top) * canvas.height,
+    };
   };
 
-  const keyupListener = (event: KeyboardEvent) => {
-    const key = mapKey(event.key, keyMapping);
-    if (!key) return;
-    keydownKeys.delete(key);
-    repeatKeys.delete(key);
-    keyupKeys.add(key);
+  const mouseMoveHandler = (e: globalThis.MouseEvent) => {
+    const x = e.clientX - canvas.offsetLeft;
+    const y = e.clientY - canvas.offsetTop;
+    lastMove = { x, y };
   };
 
-  window.addEventListener("keydown", keydownListener);
-  window.addEventListener("keyup", keyupListener);
+  const clickHandler = (e: globalThis.MouseEvent) => {
+    const { x, y } = convertScreenToCanvasCoordinates(e.clientX, e.clientY);
+    for (let i = 0; i < click.length; i++) {
+      const { box, callback } = click[i];
+      if (
+        x >= box.x &&
+        x <= box.x + box.width &&
+        y >= box.y &&
+        y <= box.y + box.height
+      )
+        backlog.push(callback);
+    }
+  };
+
+  window.addEventListener("mousemove", mouseMoveHandler);
+  window.addEventListener("click", clickHandler);
 
   return {
     update: () => {
-      const downKeysArray = [...keydownKeys.keys()];
-      for (let i = 0; i < downKeysArray.length; i++) {
-        const key = downKeysArray[i];
-        const callbacks = mouseCallbacks.get(key) || [];
-        for (let j = 0; j < callbacks.length; j++)
-          if (callbacks[j].type !== "keyup") callbacks[j].callback();
-        keydownKeys.delete(key);
-        repeatKeys.add(key);
+      if (lastMove) {
+        for (let i = 0; i < move.length; i++)
+          move[i].callback(lastMove.x, lastMove.y);
+        lastMove = null;
       }
 
-      const releasedKeysArray = [...keyupKeys.keys()];
-      for (let i = 0; i < releasedKeysArray.length; i++) {
-        const key = releasedKeysArray[i];
-        const callbacks = mouseCallbacks.get(key) || [];
-        for (let j = 0; j < callbacks.length; j++)
-          if (callbacks[j].type === "keyup") callbacks[j].callback();
-        repeatKeys.delete(key);
-        keyupKeys.delete(key);
-      }
-
-      const repeatKeysArray = [...repeatKeys.keys()];
-      for (let i = 0; i < repeatKeysArray.length; i++) {
-        const key = repeatKeysArray[i];
-        const callbacks = mouseCallbacks.get(key) || [];
-        for (let j = 0; j < callbacks.length; j++)
-          if (callbacks[j].type === "repeat") callbacks[j].callback();
-      }
+      for (let i = 0; i < backlog.length; i++) backlog[i]();
+      backlog = [];
     },
-    subscribe: ({
-      key,
-      type,
-      callback,
-    }: {
-      key: Key;
-      type: KeyMapEntry["type"];
-      callback: () => void;
-    }) => {
+    subscribe: (
+      props:
+        | {
+            type: "hover-in" | "hover-out" | "click";
+            callback: () => void;
+            box: BoundingBox;
+          }
+        | {
+            type: "move";
+            callback: (x: number, y: number) => void;
+          }
+    ) => {
       const id = createCallbackId(nextId++);
-      const currentCallbacks = mouseCallbacks.get(key) || [];
-      mouseCallbacks.set(key, [...currentCallbacks, { key: id, type, callback }]);
+      if (props.type === "move") {
+        move.push({
+          key: id,
+          type: props.type,
+          callback: props.callback,
+        });
+      } else {
+        const listener = {
+          key: id,
+          type: props.type,
+          box: props.box,
+          callback: props.callback,
+        };
+        switch (props.type) {
+          case "hover-in":
+            hoverIn.push(listener);
+            break;
+          case "hover-out":
+            hoverOut.push(listener);
+            break;
+          case "click":
+            click.push(listener);
+            break;
+        }
+      }
       return id;
     },
-    unsubscribe: (key: Key, id: number) => {
-      const currentCallbacks = mouseCallbacks.get(key) || [];
-      mouseCallbacks.set(
-        key,
-        currentCallbacks.filter((entry) => entry.key !== id)
-      );
+    unsubscribe: (
+      type: "hover-in" | "hover-out" | "click" | "move",
+      id: MouseCallbackId
+    ) => {
+      const array =
+        type === "move"
+          ? move
+          : type === "click"
+          ? click
+          : type === "hover-in"
+          ? hoverIn
+          : hoverOut;
+      const index = array.findIndex((listener) => listener.key === id);
+      if (index !== -1) array.splice(index, 1);
     },
     dispose: () => {
-      window.removeEventListener("keydown", keydownListener);
-      window.removeEventListener("keyup", keyupListener);
+      window.removeEventListener("mousemove", mouseMoveHandler);
+      window.removeEventListener("click", clickHandler);
     },
   };
 };
+
+export type MouseManager = ReturnType<typeof createMouseManager>;

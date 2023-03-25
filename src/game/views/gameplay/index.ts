@@ -1,8 +1,10 @@
 import { createBloonSystem } from "../../systems/bloons";
 import { createEventSystem } from "../../systems/events";
 import { createMoneySystem } from "../../systems/money";
+import { createMouseManager, MouseManager } from "../../systems/mouseInput";
 import { createPathSystem } from "../../systems/paths";
 import { createRenderSystem } from "../../systems/render";
+import { createStoreSystem } from "../../systems/store";
 import { Textures } from "../../systems/textures";
 import { GameView } from "../../types/GameView";
 
@@ -19,15 +21,20 @@ export const createGameplay = ({
   const pathSystem = createPathSystem({ type: "original" });
   const moneySystem = createMoneySystem({ eventSystem });
   const bloonSystem = createBloonSystem({ eventSystem, pathSystem });
+  const mouseSystem: MouseManager = createMouseManager({ canvas });
+  const storeSystem = createStoreSystem({ moneySystem, mouseSystem });
   const renderSystem = createRenderSystem({
     bloonSystem,
     moneySystem,
     context,
     canvas,
+    storeSystem,
   });
 
   return {
     update: (deltaTime) => {
+      mouseSystem.update();
+      storeSystem.update();
       bloonSystem.update(deltaTime);
     },
     render: () => {
