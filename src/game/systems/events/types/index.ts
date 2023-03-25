@@ -8,6 +8,7 @@ import { StageStartedEvent } from "./StageStarted";
 import { TowerFired } from "./TowerFired";
 import { TowerPlacedEvent } from "./TowerPlaced";
 import { TowerSelectedEvent } from "./TowerSelected";
+import { TowerSoldEvent } from "./TowerSold";
 
 export type BaseEvent<
   Type extends string,
@@ -27,7 +28,8 @@ export type BTDEvent =
   | TowerPlacedEvent
   | TowerSelectedEvent
   | TowerFired
-  | ExplosionCreatedEvent;
+  | ExplosionCreatedEvent
+  | TowerSoldEvent;
 
 export type EventCallbackEntry = {
   id: EventCallbackId;

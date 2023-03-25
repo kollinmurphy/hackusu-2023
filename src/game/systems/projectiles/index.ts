@@ -78,7 +78,7 @@ export const createProjectileSystem = ({
                 Math.pow(bloon.x - projectile.position.x, 2) +
                   Math.pow(bloon.y - projectile.position.y, 2)
               );
-              return distance <= projectile.range;
+              return distance <= projectile.range && bloon.type !== "white";
             });
             bloons.forEach((bloon) => {
               bloon.frozen = true;

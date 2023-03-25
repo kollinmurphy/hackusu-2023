@@ -2,11 +2,12 @@ import { createTowerId, Tower, TowerType } from "../types/Tower";
 import { EventSystem } from "./events";
 import { TowerPlacedEvent } from "./events/types/TowerPlaced";
 import { TowerSelectedEvent } from "./events/types/TowerSelected";
+import { TowerSoldEvent } from "./events/types/TowerSold";
 import { KeyboardSystem } from "./keyboard";
 import { MoneySystem } from "./money";
 import { BoundingCircle, MouseSystem } from "./mouse";
 import { PathSystem } from "./paths";
-import { getStoreStartX, getTowerIconDetails } from "./render/store";
+import { getSellButtonCoordinates, getStoreStartX, getTowerIconDetails } from "./render/store";
 import { TowerSystem } from "./towers";
 import { getTowerCost } from "./towers/cost";
 import { getTowerRange } from "./towers/range";
@@ -134,16 +135,19 @@ export const createStoreSystem = ({
     type: "TowerPlaced",
     callback: () => {
       state.placingTower = null;
+      state.selectedTower = null;
     },
   });
 
   const handleTowerClicked = (tower: TowerType) => {
     if (state.placingTower?.type === tower) {
       state.placingTower = null;
+      state.selectedTower = null;
       return;
     }
     const cost = getTowerCost(tower);
     if (moneySystem.getMoney() >= cost) {
+      state.selectedTower = null;
       state.placingTower = {
         type: tower,
         position: { x: 0, y: 0 },
@@ -153,6 +157,7 @@ export const createStoreSystem = ({
         rotation: 0,
         animation: 0,
         timeSinceFire: 0,
+        cost: 0,
       };
     }
   };
@@ -196,6 +201,27 @@ export const createStoreSystem = ({
     type: "click",
     callback: () => handleTowerClicked("superMonkey"),
   });
+
+  const button = getSellButtonCoordinates();
+  mouseSystem.subscribe({
+    box: {
+      type: "box",
+      x: button.x,
+      y: button.y,
+      width: button.width,
+      height: button.height,
+    },
+    type: "click",
+    callback: () => {
+      if (!state.selectedTower) return;
+      eventSystem.publish<TowerSoldEvent>({
+        type: "TowerSold",
+        payload: {
+          tower: state.selectedTower,
+        },
+      });
+    }
+  })
 
   return {
     getPlacingTowerDetails: (): Tower | null => {

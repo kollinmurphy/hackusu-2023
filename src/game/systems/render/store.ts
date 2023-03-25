@@ -3,6 +3,7 @@ import { MoneySystem } from "../money";
 import { RoundSystem } from "../round";
 import { StoreSystem } from "../store";
 import { Textures } from "../textures";
+import { getTowerName } from "../towers/name";
 import { renderTower } from "./tower";
 
 export const getStoreStartX = () => 780;
@@ -180,5 +181,70 @@ export const renderStore = ({
   renderTowerIcons({ context });
   renderPlacingTower({ context, storeSystem, canPlace: canPlaceTower });
 
+  renderSelectedTowerPane({ context, storeSystem });
+
   context.restore();
 };
+
+const renderSelectedTowerPane = ({
+  context,
+  storeSystem,
+}: {
+  context: CanvasRenderingContext2D;
+  storeSystem: StoreSystem;
+}) => {
+  const tower = storeSystem.getSelectedTower();
+  if (!tower) return;
+
+  context.save();
+
+  context.globalAlpha = 0.6;
+  context.fillStyle = `#B8DEB7`;
+  context.beginPath();
+  context.rect(800, 330, 224, 532);
+  context.closePath();
+  context.fill();
+  context.globalAlpha = 1;
+
+  context.fillStyle = `#056105`;
+  context.font = "28px TrebuchetMS";
+  context.fillText(getTowerName(tower.type), 912, 380);
+
+  context.strokeStyle = `#056105`;
+  context.lineWidth = 4;
+  context.beginPath();
+  context.moveTo(820, 390);
+  context.lineTo(1004, 390);
+  context.stroke();
+
+  context.fillStyle = `#A94A2E`;
+  context.beginPath();
+  const sellButtonCoordinates = getSellButtonCoordinates();
+  context.rect(
+    sellButtonCoordinates.x,
+    sellButtonCoordinates.y,
+    sellButtonCoordinates.width,
+    sellButtonCoordinates.height
+  );
+  context.closePath();
+  context.fill();
+
+  context.fillStyle = "rgba(255, 255, 255, 0.8)";
+  context.font = "24px TrebuchetMS";
+  context.textAlign = "left";
+  context.fillText("Sell for:", 830, 830);
+
+  context.fillStyle = "white";
+  context.font = "24px TrebuchetMS";
+  context.textAlign = "right";
+  context.fillText(tower.cost.toString(), 994, 830);
+
+  context.restore();
+};
+
+export const getSellButtonCoordinates = () => ({
+  x: 820,
+  y: 800,
+  width: 184,
+  height: 40,
+});

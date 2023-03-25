@@ -13,6 +13,7 @@ export type Tower = {
   animation: number;
   freezeTime?: number;
   explodeRadius?: number;
+  cost: number;
 };
 
 let nextId = 1;
