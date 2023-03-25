@@ -10,7 +10,7 @@ export const getTowerCooldown = (type: TowerType) => {
         case "bomb":
           return 1500;
         case "tack":
-          return 1500;
+          return 1000;
         case "ice":
           return 3000;
         case "superMonkey":

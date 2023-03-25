@@ -14,6 +14,17 @@ export type Tower = {
   freezeTime?: number;
   explodeRadius?: number;
   cost: number;
+  upgrades: TowerUpgrade[];
+};
+
+export type TowerUpgrade = {
+  key: string;
+  label: string;
+  cost: number;
+  pierce?: number;
+  range?: number;
+  explodeRadius?: number;
+  freezeTime?: number;
 };
 
 let nextId = 1;

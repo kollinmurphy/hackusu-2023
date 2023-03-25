@@ -46,6 +46,8 @@ export const createMouseSystem = ({
   let backlog: VoidFunction[] = [];
   let lastMove: { x: number; y: number } | null = null;
 
+  const hovering: Set<MouseCallbackId> = new Set();
+
   let nextId = 1;
 
   const convertScreenToCanvasCoordinates = (x: number, y: number) => {
@@ -92,55 +94,88 @@ export const createMouseSystem = ({
       if (lastMove) {
         for (let i = 0; i < move.length; i++)
           move[i].callback(lastMove.x, lastMove.y);
+
+        for (const id of hovering) {
+          const { box } = hoverIn.find((h) => h.key === id)!;
+          if (box.type === "box") {
+            if (
+              lastMove.x < box.x ||
+              lastMove.x > box.x + box.width ||
+              lastMove.y < box.y ||
+              lastMove.y > box.y + box.height
+            ) {
+              hovering.delete(id);
+              const callback = hoverOut.find((h) => h.key === id)!.callback;
+              backlog.push(callback);
+            }
+          }
+        }
+        for (let i = 0; i < hoverIn.length; i++) {
+          const { box, callback } = hoverIn[i];
+          if (box.type === "box" && !hovering.has(hoverIn[i].key)) {
+            if (
+              lastMove.x >= box.x &&
+              lastMove.x <= box.x + box.width &&
+              lastMove.y >= box.y &&
+              lastMove.y <= box.y + box.height
+            ) {
+              backlog.push(callback);
+              hovering.add(hoverIn[i].key);
+            }
+          }
+        }
+
         lastMove = null;
       }
 
       for (let i = 0; i < backlog.length; i++) backlog[i]();
       backlog = [];
     },
-    subscribe: (
-      props:
-        | {
-            type: "hover-in" | "hover-out";
-            callback: () => void;
-            box: BoundingBox;
-          }
-        | {
-            type: "click";
-            callback: (x: number, y: number) => void;
-            box: (BoundingBox & { type: "box" }) | BoundingCircle;
-          }
-        | {
-            type: "move";
-            callback: (x: number, y: number) => void;
-          }
-    ) => {
+    hoverSubscribe: (props: {
+      type: "hover";
+      in: () => void;
+      out: () => void;
+      box: BoundingBox & { type: "box" };
+    }) => {
       const id = createCallbackId(nextId++);
-      if (props.type === "move") {
-        move.push({
-          key: id,
-          type: props.type,
-          callback: props.callback,
-        });
-      } else {
-        const listener = {
-          key: id,
-          type: props.type,
-          box: props.box,
-          callback: props.callback,
-        };
-        switch (props.type) {
-          case "hover-in":
-            hoverIn.push(listener as any);
-            break;
-          case "hover-out":
-            hoverOut.push(listener as any);
-            break;
-          case "click":
-            click.push(listener as any);
-            break;
-        }
-      }
+      hoverIn.push({
+        key: id,
+        type: "hover-in",
+        box: props.box,
+        callback: props.in,
+      });
+      hoverOut.push({
+        key: id,
+        type: "hover-out",
+        box: props.box,
+        callback: props.out,
+      });
+    },
+    moveSubscribe: (props: {
+      type: "move";
+      callback: (x: number, y: number) => void;
+    }) => {
+      const id = createCallbackId(nextId++);
+      move.push({
+        key: id,
+        type: props.type,
+        callback: props.callback,
+      });
+    },
+    subscribe: (props: {
+      type: "click";
+      callback: (x: number, y: number) => void;
+      box: (BoundingBox & { type: "box" }) | BoundingCircle;
+    }) => {
+      const id = createCallbackId(nextId++);
+      const listener = {
+        key: id,
+        type: props.type,
+        box: props.box,
+        callback: props.callback,
+      };
+
+      click.push(listener as any);
       return id;
     },
     unsubscribe: (

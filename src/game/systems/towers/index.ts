@@ -28,7 +28,7 @@ export const createTowerSystem = ({
     type: "TowerPlaced",
     callback: (event) => {
       const cooldown = getTowerCooldown(event.payload.type);
-      const tower = {
+      const tower: Tower = {
         id: createTowerId(),
         type: event.payload.type,
         position: {
@@ -43,6 +43,7 @@ export const createTowerSystem = ({
         freezeTime: event.payload.type === "ice" ? 2000 : undefined,
         explodeRadius: event.payload.type === "bomb" ? 100 : undefined,
         cost: event.payload.cost,
+        upgrades: [],
       };
       state.towers.push(tower);
     },

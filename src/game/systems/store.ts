@@ -7,7 +7,12 @@ import { KeyboardSystem } from "./keyboard";
 import { MoneySystem } from "./money";
 import { BoundingCircle, MouseSystem } from "./mouse";
 import { PathSystem } from "./paths";
-import { getSellButtonCoordinates, getStoreStartX, getTowerIconDetails } from "./render/store";
+import {
+  getSellButtonCoordinates,
+  getStoreStartX,
+  getTowerIconDetails,
+  getUpgradeButtonCoordinates,
+} from "./render/store";
 import { TowerSystem } from "./towers";
 import { getTowerCost } from "./towers/cost";
 import { getTowerRange } from "./towers/range";
@@ -34,10 +39,12 @@ export const createStoreSystem = ({
     placingTower: Tower | null;
     selectedTower: Tower | null;
     position: { x: number; y: number };
+    upgradeHover: number;
   } = {
     placingTower: null,
     selectedTower: null,
     position: { x: 0, y: 0 },
+    upgradeHover: -1,
   };
 
   const buttonDetails = getTowerIconDetails();
@@ -65,7 +72,7 @@ export const createStoreSystem = ({
     },
   };
 
-  mouseSystem.subscribe({
+  mouseSystem.moveSubscribe({
     type: "move",
     callback: (x, y) => {
       state.position = { x, y };
@@ -158,6 +165,7 @@ export const createStoreSystem = ({
         animation: 0,
         timeSinceFire: 0,
         cost: 0,
+        upgrades: [],
       };
     }
   };
@@ -202,6 +210,32 @@ export const createStoreSystem = ({
     callback: () => handleTowerClicked("superMonkey"),
   });
 
+  mouseSystem.hoverSubscribe({
+    box: getUpgradeButtonCoordinates(0),
+    type: "hover",
+    in: () => {
+      console.log("in0");
+      state.upgradeHover = 0;
+    },
+    out: () => {
+      console.log("out0");
+      state.upgradeHover = -1;
+    },
+  });
+
+  mouseSystem.hoverSubscribe({
+    box: getUpgradeButtonCoordinates(1),
+    type: "hover",
+    in: () => {
+      console.log("in1");
+      state.upgradeHover = 1;
+    },
+    out: () => {
+      console.log("out1");
+      state.upgradeHover = -1;
+    },
+  });
+
   const button = getSellButtonCoordinates();
   mouseSystem.subscribe({
     box: {
@@ -221,8 +255,8 @@ export const createStoreSystem = ({
         },
       });
       state.selectedTower = null;
-    }
-  })
+    },
+  });
 
   return {
     getPlacingTowerDetails: (): Tower | null => {
@@ -237,6 +271,7 @@ export const createStoreSystem = ({
       if (!state.placingTower) return;
       state.placingTower.animation += deltaTime;
     },
+    isHovering: (index: number) => state.upgradeHover === index,
   };
 };
 

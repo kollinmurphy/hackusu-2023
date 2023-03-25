@@ -1,5 +1,6 @@
 import { LivesSystem } from "../lives";
 import { MoneySystem } from "../money";
+import { BoundingBox } from "../mouse";
 import { RoundSystem } from "../round";
 import { StoreSystem } from "../store";
 import { Textures } from "../textures";
@@ -7,6 +8,7 @@ import { getTowerName } from "../towers/name";
 import { RANGE_MULTIPLIER } from "../towers/range";
 import { getSellPrice } from "../towers/sellPrice";
 import { getSpeedLabel } from "../towers/speedLabel";
+import { towerUpgrades } from "../towers/upgrades";
 import { renderTower } from "./tower";
 
 export const getStoreStartX = () => 780;
@@ -184,7 +186,7 @@ export const renderStore = ({
   renderTowerIcons({ context });
   renderPlacingTower({ context, storeSystem, canPlace: canPlaceTower });
 
-  renderSelectedTowerPane({ context, storeSystem });
+  renderSelectedTowerPane({ context, storeSystem, moneySystem });
 
   context.restore();
 };
@@ -192,9 +194,11 @@ export const renderStore = ({
 const renderSelectedTowerPane = ({
   context,
   storeSystem,
+  moneySystem,
 }: {
   context: CanvasRenderingContext2D;
   storeSystem: StoreSystem;
+  moneySystem: MoneySystem;
 }) => {
   const tower = storeSystem.getSelectedTower();
   if (!tower) return;
@@ -209,6 +213,7 @@ const renderSelectedTowerPane = ({
   context.fill();
   context.globalAlpha = 1;
 
+  context.textAlign = "center";
   context.fillStyle = `#056105`;
   context.font = "24px TrebuchetMS";
   context.fillText(getTowerName(tower.type), 912, 380);
@@ -250,6 +255,57 @@ const renderSelectedTowerPane = ({
   context.textAlign = "right";
   context.fillText(getSellPrice(tower.cost).toString(), 994, 830);
 
+  const upgrades = towerUpgrades[tower.type];
+  const xStart = 810;
+  const yStart = 500;
+  const xSpacing = 10;
+  const width = 100;
+  const height = 280;
+
+  for (let i = 0; i < upgrades.length; i++) {
+    const hover = storeSystem.isHovering(i);
+    const purchased = tower.upgrades.find((u) => u.key === upgrades[i].key);
+
+    context.fillStyle =
+      hover && !purchased
+        ? "#42F042"
+        : purchased
+        ? "#11D011"
+        : moneySystem.getMoney() >= upgrades[i].cost
+        ? `#0FBD0F`
+        : "#A94A2E";
+    context.beginPath();
+    context.rect(xStart + (xSpacing + width) * i, yStart, width, height);
+    context.closePath();
+    context.fill();
+
+    const lines = upgrades[i].label.split(" ");
+    for (let j = 0; j < lines.length; j++) {
+      context.fillStyle = "white";
+      context.font = "18px TrebuchetMS";
+      context.textAlign = "center";
+      context.fillText(
+        lines[j],
+        xStart + (xSpacing + width) * i + width / 2,
+        yStart + 150 + j * 25
+      );
+    }
+
+    context.fillStyle = "rgba(255, 255, 255, 0.8)";
+    context.fillText(
+      purchased ? "Already purchased" : "Buy for:",
+      xStart + (xSpacing + width) * i + width / 2,
+      yStart + height - 40
+    );
+
+    context.fillStyle = "white";
+    context.fillText(
+      purchased ? "" : upgrades[i].cost.toString(),
+      xStart + (xSpacing + width) * i + width / 2,
+      yStart + height - 40 + 25
+    );
+  }
+
   context.restore();
 };
 
@@ -258,4 +314,14 @@ export const getSellButtonCoordinates = () => ({
   y: 800,
   width: 184,
   height: 40,
+});
+
+export const getUpgradeButtonCoordinates = (
+  index: number
+): BoundingBox & { type: "box" } => ({
+  x: 810 + (10 + 100) * index,
+  y: 500,
+  width: 100,
+  height: 280,
+  type: "box",
 });
