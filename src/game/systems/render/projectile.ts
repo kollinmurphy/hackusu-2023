@@ -22,8 +22,6 @@ export const renderProjectile = (props: {
     case "bomb":
       renderBomb({ projectile, context });
       break;
-    default:
-      console.log("Unknown projectile type: ", projectile.type);
   }
 };
 
@@ -85,7 +83,6 @@ const renderIceRing = ({
     Math.atan2(projectile.direction.y, projectile.direction.x) + Math.PI / 2
   );
   const size = (projectile.elapsed / projectile.range) * ICE_SPREAD_RATE * 3;
-  console.log(size);
   context.drawImage(
     texture,
     (-texture.width / 2) * size,

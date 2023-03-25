@@ -125,7 +125,6 @@ export const createStoreSystem = ({
   keyboardSystem.subscribe({
     key: "exit",
     callback: () => {
-      console.log("ESCAPE");
       state.placingTower = null;
     },
     type: "keydown",
@@ -153,6 +152,7 @@ export const createStoreSystem = ({
         range: getTowerRange(tower),
         rotation: 0,
         animation: 0,
+        timeSinceFire: 0,
       };
     }
   };

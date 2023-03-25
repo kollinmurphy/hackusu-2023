@@ -48,8 +48,6 @@ export const createMouseSystem = ({
 
   let nextId = 1;
 
-  // let points: { x: number; y: number }[] = [];
-
   const convertScreenToCanvasCoordinates = (x: number, y: number) => {
     const rect = canvas.getBoundingClientRect();
     return {
@@ -63,26 +61,8 @@ export const createMouseSystem = ({
     lastMove = { x, y };
   };
 
-  // const outputInfoToConsole = () => {
-  //   if (points.length % 2 !== 0) return;
-  //   const boxes = [];
-  //   for (let i = 0; i < points.length; i += 2) {
-  //     boxes.push({
-  //       x: Math.round(points[i].x),
-  //       y: Math.round(points[i].y),
-  //       width: Math.round(points[i + 1].x - points[i].x),
-  //       height: Math.round(points[i + 1].y - points[i].y),
-  //     });
-  //   }
-  //   const stringified = JSON.stringify(boxes);
-  //   console.log(stringified.substring(1, stringified.length - 1));
-  // };
-
   const clickHandler = (e: globalThis.MouseEvent) => {
     const { x, y } = convertScreenToCanvasCoordinates(e.clientX, e.clientY);
-    console.log(`click at ${x}, ${y}`);
-    // points.push({ x, y });
-    // outputInfoToConsole();
     for (let i = 0; i < click.length; i++) {
       const { box, callback } = click[i];
       if (box.type === "box") {

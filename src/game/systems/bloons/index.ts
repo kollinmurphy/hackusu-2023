@@ -4,6 +4,7 @@ import { BloonCreatedEvent } from "../events/types/BloonCreated";
 import { BloonEscapedEvent } from "../events/types/BloonEscaped";
 import { BloonHitEvent } from "../events/types/BloonHit";
 import { BloonPoppedEvent } from "../events/types/BloonPopped";
+import { ExplosionCreatedEvent } from "../events/types/ExplosionCreated";
 import { StageStartedEvent } from "../events/types/StageStarted";
 import { PathSystem } from "../paths";
 import { getBloonChildren } from "./children";
@@ -87,6 +88,16 @@ export const createBloonSystem = ({
       });
 
       if (event.payload.projectile.type === "bomb") {
+        eventSystem.publish<ExplosionCreatedEvent>({
+          type: "ExplosionCreated",
+          payload: {
+            position: {
+              x: event.payload.bloon.x,
+              y: event.payload.bloon.y,
+            },
+            radius: 100,
+          },
+        });
         const nearbyBloons = state.bloons
           .filter((bloon) => {
             return (

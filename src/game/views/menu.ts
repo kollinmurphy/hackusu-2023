@@ -12,9 +12,7 @@ export const createMenu = ({
   const textures = Textures();
 
   return {
-    update: (deltaTime) => {
-      console.log("Menu update", deltaTime);
-    },
+    update: () => {},
     render: () => {
       context.drawImage(textures.menu.bloons, 0, 0);
     },

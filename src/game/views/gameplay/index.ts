@@ -4,6 +4,7 @@ import { createKeyboardSystem } from "../../systems/keyboard";
 import { createLivesSystem } from "../../systems/lives";
 import { createMoneySystem } from "../../systems/money";
 import { createMouseSystem } from "../../systems/mouse";
+import { createParticleSystem } from "../../systems/particles";
 import { createPathSystem } from "../../systems/paths";
 import { createProjectileSystem } from "../../systems/projectiles";
 import { createRenderSystem } from "../../systems/render";
@@ -46,6 +47,7 @@ export const createGameplay = ({
     bloonSystem,
     pathSystem,
   });
+  const particleSystem = createParticleSystem({ eventSystem });
   const renderSystem = createRenderSystem({
     bloonSystem,
     moneySystem,
@@ -57,6 +59,7 @@ export const createGameplay = ({
     livesSystem,
     towerSystem,
     projectileSystem,
+    particleSystem,
   });
 
   return {
@@ -68,6 +71,7 @@ export const createGameplay = ({
       towerSystem.update(deltaTime);
       storeSystem.update(deltaTime);
       projectileSystem.update(deltaTime);
+      particleSystem.update(deltaTime);
     },
     render: () => {
       renderSystem.render();

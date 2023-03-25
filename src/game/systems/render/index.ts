@@ -1,6 +1,7 @@
 import { BloonSystem } from "../bloons";
 import { LivesSystem } from "../lives";
 import { MoneySystem } from "../money";
+import { ParticleSystem } from "../particles";
 import { PathSystem } from "../paths";
 import { ProjectileSystem } from "../projectiles";
 import { RoundSystem } from "../round";
@@ -9,6 +10,7 @@ import { TowerSystem } from "../towers";
 import { canPlaceTower } from "../towers/canPlace";
 import { renderBloon } from "./bloon";
 import { renderMap } from "./map";
+import { renderParticles } from "./particles";
 import { renderProjectile } from "./projectile";
 import { renderStore } from "./store";
 import { renderTower } from "./tower";
@@ -24,6 +26,7 @@ export const createRenderSystem = ({
   livesSystem,
   towerSystem,
   projectileSystem,
+  particleSystem,
 }: {
   canvas: HTMLCanvasElement;
   context: CanvasRenderingContext2D;
@@ -35,6 +38,7 @@ export const createRenderSystem = ({
   livesSystem: LivesSystem;
   towerSystem: TowerSystem;
   projectileSystem: ProjectileSystem;
+  particleSystem: ParticleSystem;
 }) => {
   return {
     render: () => {
@@ -59,6 +63,7 @@ export const createRenderSystem = ({
         renderTower({ tower, context });
       for (const projectile of projectileSystem.getProjectiles())
         renderProjectile({ projectile, context });
+      renderParticles({ particleSystem, context });
     },
   };
 };

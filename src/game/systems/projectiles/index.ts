@@ -65,13 +65,12 @@ export const createProjectileSystem = ({
             Math.pow(projectile.position.y - projectile.origin.y, 2)
         );
         if (
-          distance >= projectile.range ||
+          distance >= projectile.range * 1.4 ||
           (projectile.type === "ice" &&
             projectile.elapsed >= projectile.range / ICE_SPREAD_RATE)
         ) {
           state.projectiles.splice(i, 1);
           i--;
-          console.log("projectile destroyed");
           if (projectile.type === "ice") {
             // freeze bloons in radius
             const bloons = bloonSystem.getBloons().filter((bloon) => {
@@ -102,7 +101,6 @@ export const createProjectileSystem = ({
         });
         state.projectiles.splice(i, 1);
         i--;
-        console.log("projectile hit");
       }
     },
     getProjectiles: () => state.projectiles,
