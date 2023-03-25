@@ -18,5 +18,6 @@ export type Projectile = {
   damage: number;
   range: number;
   elapsed: number;
+  freezeTime?: number;
   // target: BloonId;
 };

@@ -11,6 +11,7 @@ export type Tower = {
   cooldown: number;
   timeSinceFire: number;
   animation: number;
+  freezeTime?: number;
 };
 
 let nextId = 1;

@@ -1,76 +1,13 @@
-import { Bloon } from "../../types/bloon";
-import { createProjectileId, Projectile } from "../../types/Projectile";
+import { Projectile } from "../../types/Projectile";
 import { BloonSystem } from "../bloons";
-import { getBloonSpeed } from "../bloons/speed";
 import { EventSystem } from "../events";
 import { BloonHitEvent } from "../events/types/BloonHit";
 import { TowerFired } from "../events/types/TowerFired";
 import { PathSystem } from "../paths";
-
-const getTimeToHit = ({
-  bloon,
-  origin,
-  speed,
-}: {
-  bloon: Pick<Bloon, "x" | "y">;
-  origin: Projectile["position"];
-  speed: number;
-}) => {
-  const distanceToBloon = Math.sqrt(
-    Math.pow(bloon.x - origin.x, 2) + Math.pow(bloon.y - origin.y, 2)
-  );
-  const timeToHit = distanceToBloon * speed;
-  return timeToHit * 1000;
-};
-
-const getPositionAfterTime = ({
-  bloon,
-  time,
-  pathSystem,
-}: {
-  bloon: Bloon;
-  time: number;
-  pathSystem: PathSystem;
-}) => {
-  const estimatedHitPosition = pathSystem.computePoint(
-    bloon.distance + getBloonSpeed(bloon) * time
-  );
-  return estimatedHitPosition;
-};
-
-const getHitPosition = ({
-  bloon,
-  origin,
-  speed,
-  level,
-  pathSystem,
-}: {
-  bloon: Bloon;
-  origin: Projectile["position"];
-  speed: number;
-  level: number;
-  pathSystem: PathSystem;
-}) => {
-  let position = {
-    x: origin.x,
-    y: origin.y,
-  };
-  let time: number;
-  for (let i = 0; i < level; i++) {
-    time = getTimeToHit({
-      bloon: position,
-      origin,
-      speed,
-    }) * 1.5;
-    position = getPositionAfterTime({
-      bloon,
-      time,
-      pathSystem,
-    });
-  }
-  console.log(time!);
-  return position!;
-};
+import { createDart } from "./darts";
+import { createIceRing, ICE_SPREAD_RATE } from "./ice";
+import { getProjectileRadius } from "./radius";
+import { createTacks } from "./tacks";
 
 export const createProjectileSystem = ({
   eventSystem,
@@ -91,34 +28,21 @@ export const createProjectileSystem = ({
     type: "TowerFired",
     callback: (event) => {
       const { tower, bloon } = event.payload;
-      const speed = 0.01;
-      const estimantedHitPosition = getHitPosition({
-        bloon,
-        origin: tower.position,
-        speed,
-        level: 1,
-        pathSystem,
-      });
-      const direction = {
-        x: estimantedHitPosition.x - tower.position.x,
-        y: estimantedHitPosition.y - tower.position.y,
-      };
-      state.projectiles.push({
-        id: createProjectileId(),
-        position: {
-          x: tower.position.x,
-          y: tower.position.y,
-        },
-        origin: {
-          x: tower.position.x,
-          y: tower.position.y,
-        },
-        direction,
-        speed,
-        damage: 1,
-        range: 100,
-        elapsed: 0,
-        type: tower.type,
+      const projectiles = (() => {
+        switch (tower.type) {
+          case "dartMonkey":
+          case "superMonkey":
+            return createDart({ bloon, pathSystem, tower });
+          case "tack":
+            return createTacks({ tower });
+          case "ice":
+            return createIceRing({ tower });
+          default:
+            return [];
+        }
+      })();
+      projectiles?.forEach((projectile) => {
+        state.projectiles.push(projectile);
       });
     },
   });
@@ -137,17 +61,37 @@ export const createProjectileSystem = ({
           Math.pow(projectile.position.x - projectile.origin.x, 2) +
             Math.pow(projectile.position.y - projectile.origin.y, 2)
         );
-        if (distance >= projectile.range * 2) {
+        if (
+          distance >= projectile.range ||
+          (projectile.type === "ice" &&
+            projectile.elapsed >= projectile.range / ICE_SPREAD_RATE)
+        ) {
           state.projectiles.splice(i, 1);
           i--;
-          console.log("projectile removed");
+          console.log("projectile destroyed");
+          if (projectile.type === "ice") {
+            // freeze bloons in radius
+            const bloons = bloonSystem.getBloons().filter((bloon) => {
+              const distance = Math.sqrt(
+                Math.pow(bloon.x - projectile.position.x, 2) +
+                  Math.pow(bloon.y - projectile.position.y, 2)
+              );
+              return distance <= projectile.range;
+            });
+            bloons.forEach((bloon) => {
+              bloon.frozen = true;
+              bloon.frozenDuration = projectile.freezeTime!;
+              bloon.frozenTime = 0;
+            });
+          }
+
           continue;
         }
 
         const bloon = bloonSystem.getLastBloonInRadius({
           x: projectile.position.x,
           y: projectile.position.y,
-          radius: 40,
+          radius: getProjectileRadius(projectile.type),
         });
         if (!bloon) continue;
         eventSystem.publish<BloonHitEvent>({
@@ -156,7 +100,7 @@ export const createProjectileSystem = ({
         });
         state.projectiles.splice(i, 1);
         i--;
-        console.log("projectile removed");
+        console.log("projectile hit");
       }
     },
     getProjectiles: () => state.projectiles,

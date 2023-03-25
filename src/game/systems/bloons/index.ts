@@ -157,6 +157,14 @@ export const createBloonSystem = ({
       }
 
       for (const bloon of state.bloons) {
+        if (bloon.frozen) {
+          bloon.frozenTime += deltaTime;
+          if (bloon.frozenTime > bloon.frozenDuration) {
+            bloon.frozen = false;
+          } else {
+            continue;
+          }
+        }
         bloon.distance += getBloonSpeed(bloon) * deltaTime;
         const coordinates = pathSystem.computePoint(bloon.distance);
         bloon.x = coordinates.x;

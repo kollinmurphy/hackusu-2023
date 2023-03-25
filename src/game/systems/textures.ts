@@ -11,6 +11,7 @@ export type TextureMap = {
     dart: HTMLImageElement;
     iceRing: HTMLImageElement;
     tack: HTMLImageElement;
+    tack1: HTMLImageElement;
   };
   effects: {
     pop: HTMLImageElement;
@@ -152,6 +153,7 @@ export const initializeTextures = async () => {
     shopSuperMonkey,
     shopTackTower,
     towerTackOrb2,
+    projectileTack1,
   ] = await Promise.all(
     [
       "bloons/red.svg",
@@ -210,6 +212,7 @@ export const initializeTextures = async () => {
       "shop/super-monkey.svg",
       "shop/tack-shooter.svg",
       "towers/tack-orb2.svg",
+      "projectiles/tack.svg",
     ].map((src) => loadTexture(`./assets/${src}`))
   ).catch((error) => {
     console.error(error);
@@ -232,6 +235,7 @@ export const initializeTextures = async () => {
       dart: projectileDart,
       iceRing: projectileIceRing,
       tack: projectileTack,
+      tack1: projectileTack1,
     },
     effects: {
       pop: effectPop,
