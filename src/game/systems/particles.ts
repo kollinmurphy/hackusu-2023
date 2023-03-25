@@ -23,6 +23,7 @@ export const createParticleSystem = ({
   eventSystem.subscribe<BloonPoppedEvent>({
     type: "BloonPopped",
     callback: (event) => {
+      if (!event.payload.effect) return;
       const { bloon } = event.payload;
       const particle: Particle = {
         type: "pop",

@@ -25,7 +25,7 @@ export const createRoundSystem = ({
   };
 
   const handleCheckStageCleared = () => {
-    if (bloonSystem.getBloons().length === 0) {
+    if (bloonSystem.isComplete()) {
       eventSystem.publish<StageClearedEvent>({
         type: "StageCleared",
         payload: {

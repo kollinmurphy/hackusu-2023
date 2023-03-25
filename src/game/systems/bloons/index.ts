@@ -64,6 +64,7 @@ export const createBloonSystem = ({
       state.round = event.payload.stage;
       state.bloonTime = 0;
       state.bloonsCreated = 0;
+      state.finishedSpawning = false;
     },
   });
 
@@ -84,6 +85,7 @@ export const createBloonSystem = ({
         type: "BloonPopped",
         payload: {
           bloon: poppedBloon,
+          effect: event.payload.projectile.type !== "bomb",
         },
       });
 
@@ -95,7 +97,7 @@ export const createBloonSystem = ({
               x: event.payload.bloon.x,
               y: event.payload.bloon.y,
             },
-            radius: 100,
+            radius: 200,
           },
         });
         const nearbyBloons = state.bloons
@@ -119,6 +121,7 @@ export const createBloonSystem = ({
             type: "BloonPopped",
             payload: {
               bloon,
+              effect: false,
             },
           });
         }
@@ -170,6 +173,7 @@ export const createBloonSystem = ({
       return null;
     },
     getBloons: () => state.bloons,
+    isComplete: () => state.bloons.length === 0 && state.finishedSpawning,
     getBloon: (id: BloonId) => {
       return state.bloons.find((bloon) => bloon.id === id);
     },
