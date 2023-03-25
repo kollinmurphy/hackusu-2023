@@ -71,7 +71,6 @@ export const createProjectileSystem = ({
         ) {
           state.projectiles.splice(i, 1);
           i--;
-          console.log(`clear projectile ${projectile.id} (out of range)`);
           if (projectile.type === "ice") {
             // freeze bloons in radius
             const bloons = bloonSystem.getBloons().filter((bloon) => {
@@ -101,7 +100,6 @@ export const createProjectileSystem = ({
           payload: { bloon, projectile },
         });
         if (projectile.pierced >= projectile.pierce) {
-          console.log(`clear bloon ${bloon.id} from ${projectile.id}; ${projectile.pierced} / ${projectile.pierce}`);
           state.projectiles.splice(i, 1);
           i--;
         } else {

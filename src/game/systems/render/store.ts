@@ -1,9 +1,13 @@
+import canvasTxt from "canvas-txt";
 import { LivesSystem } from "../lives";
 import { MoneySystem } from "../money";
 import { BoundingBox } from "../mouse";
 import { RoundSystem } from "../round";
 import { StoreSystem } from "../store";
 import { Textures } from "../textures";
+import { getTowerCooldown } from "../towers/cooldown";
+import { getTowerCost } from "../towers/cost";
+import { getTowerDescription } from "../towers/description";
 import { getTowerName } from "../towers/name";
 import { RANGE_MULTIPLIER } from "../towers/range";
 import { getSellPrice } from "../towers/sellPrice";
@@ -186,7 +190,11 @@ export const renderStore = ({
   renderTowerIcons({ context });
   renderPlacingTower({ context, storeSystem, canPlace: canPlaceTower });
 
-  renderSelectedTowerPane({ context, storeSystem, moneySystem });
+  if (storeSystem.getHoverTower()) {
+    renderHoveredTower({ context, storeSystem });
+  } else {
+    renderSelectedTowerPane({ context, storeSystem, moneySystem });
+  }
 
   context.restore();
 };
@@ -332,3 +340,54 @@ export const getUpgradeButtonCoordinates = (
   height: 280,
   type: "box",
 });
+
+const renderHoveredTower = ({
+  context,
+  storeSystem,
+}: {
+  context: CanvasRenderingContext2D;
+  storeSystem: StoreSystem;
+}) => {
+  const tower = storeSystem.getHoverTower();
+  if (!tower) return;
+
+  context.save();
+
+  context.globalAlpha = 0.6;
+  context.fillStyle = `#B8DEB7`;
+  context.beginPath();
+  context.rect(800, 330, 224, 532);
+  context.closePath();
+  context.fill();
+  context.globalAlpha = 1;
+
+  context.textAlign = "center";
+  context.fillStyle = `#056105`;
+  context.font = "24px TrebuchetMS";
+  context.fillText(getTowerName(tower), 912, 380);
+
+  context.strokeStyle = `#056105`;
+  context.lineWidth = 4;
+  context.beginPath();
+  context.moveTo(820, 390);
+  context.lineTo(1004, 390);
+  context.stroke();
+
+  context.textAlign = "left";
+  context.fillText("Cost:", 810, 430);
+  context.fillText("Speed:", 810, 480);
+
+  context.textAlign = "right";
+  context.fillText(getTowerCost(tower).toString(), 1014, 430);
+  context.fillText(getSpeedLabel(getTowerCooldown(tower)), 1014, 480);
+
+  context.textAlign = "left";
+  const description = getTowerDescription(tower);
+  canvasTxt.fontSize = 18;
+  canvasTxt.font = "TrebuchetMS";
+  canvasTxt.align = "left";
+  canvasTxt.vAlign = "top";
+  canvasTxt.drawText(context, description, 815, 500, 200, 200);
+
+  context.restore();
+};

@@ -40,11 +40,13 @@ export const createStoreSystem = ({
   const state: {
     placingTower: Tower | null;
     selectedTower: Tower | null;
+    hoverTower: TowerType | null;
     position: { x: number; y: number };
     upgradeHover: number;
   } = {
     placingTower: null,
     selectedTower: null,
+    hoverTower: null,
     position: { x: 0, y: 0 },
     upgradeHover: -1,
   };
@@ -188,10 +190,24 @@ export const createStoreSystem = ({
     callback: () => handleTowerClicked("dartMonkey"),
   });
 
+  mouseSystem.hoverSubscribe({
+    box: createBoundingCircle(boxes.dartMonkey),
+    type: "hover",
+    in: () => (state.hoverTower = "dartMonkey"),
+    out: () => (state.hoverTower = null),
+  });
+
   mouseSystem.subscribe({
     box: createBoundingCircle(boxes.tackTower),
     type: "click",
     callback: () => handleTowerClicked("tack"),
+  });
+
+  mouseSystem.hoverSubscribe({
+    box: createBoundingCircle(boxes.tackTower),
+    type: "hover",
+    in: () => (state.hoverTower = "tack"),
+    out: () => (state.hoverTower = null),
   });
 
   mouseSystem.subscribe({
@@ -200,16 +216,37 @@ export const createStoreSystem = ({
     callback: () => handleTowerClicked("ice"),
   });
 
+  mouseSystem.hoverSubscribe({
+    box: createBoundingCircle(boxes.iceTower),
+    type: "hover",
+    in: () => (state.hoverTower = "ice"),
+    out: () => (state.hoverTower = null),
+  });
+
   mouseSystem.subscribe({
     box: createBoundingCircle(boxes.bombTower),
     type: "click",
     callback: () => handleTowerClicked("bomb"),
   });
 
+  mouseSystem.hoverSubscribe({
+    box: createBoundingCircle(boxes.bombTower),
+    type: "hover",
+    in: () => (state.hoverTower = "bomb"),
+    out: () => (state.hoverTower = null),
+  });
+
   mouseSystem.subscribe({
     box: createBoundingCircle(boxes.superMonkey),
     type: "click",
     callback: () => handleTowerClicked("superMonkey"),
+  });
+
+  mouseSystem.hoverSubscribe({
+    box: createBoundingCircle(boxes.superMonkey),
+    type: "hover",
+    in: () => (state.hoverTower = "superMonkey"),
+    out: () => (state.hoverTower = null),
   });
 
   const upgrade0 = getUpgradeButtonCoordinates(0);
@@ -320,6 +357,7 @@ export const createStoreSystem = ({
       state.placingTower.animation += deltaTime;
     },
     isHovering: (index: number) => state.upgradeHover === index,
+    getHoverTower: () => state.hoverTower,
   };
 };
 

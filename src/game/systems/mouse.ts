@@ -108,16 +108,38 @@ export const createMouseSystem = ({
               const callback = hoverOut.find((h) => h.key === id)!.callback;
               backlog.push(callback);
             }
+          } else {
+            if (
+              Math.sqrt(
+                Math.pow(box.x - lastMove.x, 2) +
+                  Math.pow(box.y - lastMove.y, 2)
+              ) > box.radius
+            ) {
+              hovering.delete(id);
+              const callback = hoverOut.find((h) => h.key === id)!.callback;
+              backlog.push(callback);
+            }
           }
         }
         for (let i = 0; i < hoverIn.length; i++) {
           const { box, callback } = hoverIn[i];
-          if (box.type === "box" && !hovering.has(hoverIn[i].key)) {
+          if (hovering.has(hoverIn[i].key)) continue;
+          if (box.type === "box") {
             if (
               lastMove.x >= box.x &&
               lastMove.x <= box.x + box.width &&
               lastMove.y >= box.y &&
               lastMove.y <= box.y + box.height
+            ) {
+              backlog.push(callback);
+              hovering.add(hoverIn[i].key);
+            }
+          } else {
+            if (
+              Math.sqrt(
+                Math.pow(box.x - lastMove.x, 2) +
+                  Math.pow(box.y - lastMove.y, 2)
+              ) <= box.radius
             ) {
               backlog.push(callback);
               hovering.add(hoverIn[i].key);
@@ -135,7 +157,7 @@ export const createMouseSystem = ({
       type: "hover";
       in: () => void;
       out: () => void;
-      box: BoundingBox & { type: "box" };
+      box: (BoundingBox & { type: "box" }) | BoundingCircle;
     }) => {
       const id = createCallbackId(nextId++);
       hoverIn.push({

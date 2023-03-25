@@ -2,7 +2,6 @@ import { createProjectileId, Projectile } from "../../types/Projectile";
 import { Tower } from "../../types/Tower";
 
 export const createIceRing = ({ tower }: { tower: Tower }): Projectile[] => {
-  console.log(tower.freezeTime);
   return [
     {
       id: createProjectileId(),

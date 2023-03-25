@@ -173,13 +173,7 @@ export const createBloonSystem = ({
       return null;
     },
     getBloons: () => state.bloons,
-    isComplete: () => {
-      console.log({
-        bloons: state.bloons.length,
-        finishedSpawning: state.finishedSpawning,
-      });
-      return state.bloons.length === 0 && state.finishedSpawning;
-    },
+    isComplete: () => state.bloons.length === 0 && state.finishedSpawning,
     getBloon: (id: BloonId) => {
       return state.bloons.find((bloon) => bloon.id === id);
     },
