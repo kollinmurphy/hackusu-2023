@@ -70,6 +70,13 @@ export type TextureMap = {
       tack: HTMLImageElement;
     };
   };
+  shop: {
+    bombTower: HTMLImageElement;
+    dartMonkey: HTMLImageElement;
+    iceTower: HTMLImageElement;
+    tackTower: HTMLImageElement;
+    superMonkey: HTMLImageElement;
+  };
 };
 
 const loadTexture = (src: string): Promise<HTMLImageElement> => {
@@ -138,6 +145,11 @@ export const initializeTextures = async () => {
     towerTackOrb,
     towerTackBase,
     towerTack,
+    shopBombTower,
+    shopDartMonkey,
+    shopIceTower,
+    shopSuperMonkey,
+    shopTackTower,
   ] = await Promise.all(
     [
       "bloons/red.svg",
@@ -150,7 +162,7 @@ export const initializeTextures = async () => {
       "projectiles/bomb.svg",
       "projectiles/dart.svg",
       "projectiles/ice-ring.svg",
-      "projectiles/tack.svg",
+      "projectiles/tack2.svg",
       "effects/pop.svg",
       "effects/explosion/explosion0.svg",
       "effects/explosion/explosion1.svg",
@@ -191,7 +203,11 @@ export const initializeTextures = async () => {
       "towers/tack-orb.svg",
       "towers/tack-base.svg",
       "towers/tack.svg",
-
+      "shop/bomb-tower.svg",
+      "shop/dart-monkey.svg",
+      "shop/ice-tower.svg",
+      "shop/super-monkey.svg",
+      "shop/tack-shooter.svg",
     ].map((src) => loadTexture(`./assets/${src}`))
   ).catch((error) => {
     console.error(error);
@@ -272,7 +288,14 @@ export const initializeTextures = async () => {
         orb: towerTackOrb,
         tack: towerTack,
       },
-    }
+    },
+    shop: {
+      bombTower: shopBombTower,
+      dartMonkey: shopDartMonkey,
+      iceTower: shopIceTower,
+      superMonkey: shopSuperMonkey,
+      tackTower: shopTackTower,
+    },
   };
   textures = map;
 };
