@@ -1,3 +1,6 @@
+import { BloonCreatedEvent } from "./BloonCreated";
+import { BloonPoppedEvent } from "./BloonPopped";
+
 export type BaseEvent<
   Type extends string,
   Payload extends Record<string, any>
@@ -6,7 +9,7 @@ export type BaseEvent<
   payload: Payload;
 };
 
-export type BTDEvent = BaseEvent<"TEST", { test: string }>;
+export type BTDEvent = BloonCreatedEvent | BloonPoppedEvent
 
 export type EventCallbackEntry = {
   id: EventCallbackId;

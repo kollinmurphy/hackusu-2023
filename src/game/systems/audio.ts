@@ -1,6 +1,6 @@
 const loadAudio = (filename: string): Promise<HTMLAudioElement> => {
   const element = document.createElement("audio");
-  element.src = `./assets/audio/${filename}`;
+  element.src = `./assets/sounds/${filename}`;
   element.preload = "auto";
   return new Promise((resolve, reject) => {
     element.oncanplaythrough = () => {
@@ -13,15 +13,13 @@ const loadAudio = (filename: string): Promise<HTMLAudioElement> => {
 };
 
 type AudioKey =
-  | "coin"
-  | "gameover"
-  | "hit"
-  | "die"
-  | "powerdown"
-  | "win"
-  | "theme"
-  | "powerup"
-  | "pause";
+  | "bounce"
+  | "explode0"
+  | "explode1"
+  | "pop0"
+  | "pop1"
+  | "pop2"
+  | "pop3";
 
 type PlayOptions = {
   key: AudioKey;
@@ -45,28 +43,24 @@ export type AudioApi = {
 };
 
 export const initializeAudio = async () => {
-  const [coin, gameover, hit, die, powerdown, win, theme, powerup, pause] =
+  const [bounce, explode0, explode1, pop0, pop1, pop2, pop3] =
     await Promise.all([
-      loadAudio("smb_coin.wav"),
-      loadAudio("smb_gameover.wav"),
-      loadAudio("smb_kick.wav"),
-      loadAudio("smb_mariodie.wav"),
-      loadAudio("smb_pipe.wav"),
-      loadAudio("smb_stage_clear.wav"),
-      loadAudio("smb_theme.mp3"),
-      loadAudio("smb_powerup.wav"),
-      loadAudio("smb_pause.wav"),
+      loadAudio("bounce.mp3"),
+      loadAudio("explode0.mp3"),
+      loadAudio("explode1.mp3"),
+      loadAudio("pop0.mp3"),
+      loadAudio("pop1.mp3"),
+      loadAudio("pop2.mp3"),
+      loadAudio("pop3.mp3"),
     ]);
   const map: Map<AudioKey, HTMLAudioElement> = new Map([
-    ["coin", coin],
-    ["gameover", gameover],
-    ["hit", hit],
-    ["die", die],
-    ["powerdown", powerdown],
-    ["win", win],
-    ["theme", theme],
-    ["powerup", powerup],
-    ["pause", pause],
+    ["bounce", bounce],
+    ["explode0", explode0],
+    ["explode1", explode1],
+    ["pop0", pop0],
+    ["pop1", pop1],
+    ["pop2", pop2],
+    ["pop3", pop3],
   ]);
 
   const api: AudioApi = {

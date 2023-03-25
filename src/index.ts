@@ -15,7 +15,6 @@ import "./style.css";
   const gameLoop = (currentTime: number) => {
     const deltaTime = currentTime - previousTime;
     previousTime = currentTime;
-    game.processInput();
     game.update(deltaTime);
     game.render();
     requestAnimationFrame(gameLoop);
