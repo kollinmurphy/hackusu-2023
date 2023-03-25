@@ -15,7 +15,7 @@ export const createIceRing = ({ tower }: { tower: Tower }): Projectile[] => {
       type: "ice",
       freezeTime: tower.freezeTime,
       pierce: tower.pierce || 0,
-      pierced: 0,
+      pierced: [],
     },
   ];
 };

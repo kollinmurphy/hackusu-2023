@@ -95,15 +95,27 @@ export const createProjectileSystem = ({
           radius: getProjectileRadius(projectile.type),
         });
         if (!bloon) continue;
+        if (bloon.frozen && projectile.type !== "bomb") {
+          state.projectiles.splice(i, 1);
+          i--;
+          continue;
+        }
+        const pierced = new Set(projectile.pierced);
+        const parents = new Set(bloon.parents);
+        const intersection = new Set(
+          [...pierced].filter((x) => parents.has(x))
+        );
+        if (intersection.size > 0) continue;
+        console.log(`hit bloon ${bloon.id} with projectile ${projectile.id}`);
         eventSystem.publish<BloonHitEvent>({
           type: "BloonHit",
           payload: { bloon, projectile },
         });
-        if (projectile.pierced >= projectile.pierce) {
+        if (projectile.pierced.length >= projectile.pierce) {
           state.projectiles.splice(i, 1);
           i--;
         } else {
-          projectile.pierced++;
+          projectile.pierced.push(bloon.id);
         }
       }
     },

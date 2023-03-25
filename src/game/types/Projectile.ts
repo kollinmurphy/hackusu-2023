@@ -1,3 +1,4 @@
+import { BloonId } from "./bloon";
 import { TowerType } from "./Tower";
 
 export type ProjectileId = number & { __brand: "projectileId" };
@@ -21,5 +22,5 @@ export type Projectile = {
   freezeTime?: number;
   explodeRadius?: number;
   pierce: number;
-  pierced: number;
+  pierced: BloonId[];
 };

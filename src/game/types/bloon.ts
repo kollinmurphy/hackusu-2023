@@ -1,6 +1,6 @@
-export type BloonId = number & { _brand: 'bloonId' };
+export type BloonId = number & { _brand: "bloonId" };
 
-export type BloonType = 'red' | 'blue' | 'green' | 'yellow' | 'white' | 'black';
+export type BloonType = "red" | "blue" | "green" | "yellow" | "white" | "black";
 
 export type Bloon = {
   id: BloonId;
@@ -12,6 +12,7 @@ export type Bloon = {
   x: number;
   y: number;
   escaped: boolean;
-}
+  parents: BloonId[];
+};
 
 export const createBloonId = (num: number) => num as BloonId;

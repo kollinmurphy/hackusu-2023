@@ -52,7 +52,7 @@ export const createDart = ({
       elapsed: 0,
       type: tower.type,
       pierce: tower.pierce || 0,
-      pierced: 0,
+      pierced: [],
     },
   ];
 };

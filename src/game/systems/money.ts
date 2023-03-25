@@ -11,8 +11,8 @@ export const createMoneySystem = ({
 }: {
   eventSystem: EventSystem;
 }) => {
-  let money = 1000;
-  // let money = 1000000;
+  // let money = 1000;
+  let money = 1000000;
 
   eventSystem.subscribe<BloonPoppedEvent>({
     type: "BloonPopped",

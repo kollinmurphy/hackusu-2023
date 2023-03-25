@@ -1,6 +1,7 @@
 import { Bloon, BloonId, BloonType, createBloonId } from "../../types/bloon";
 import { EventSystem } from "../events";
 import { BloonCreatedEvent } from "../events/types/BloonCreated";
+import { BloonDestroyedEvent } from "../events/types/BloonDestroyed";
 import { BloonEscapedEvent } from "../events/types/BloonEscaped";
 import { BloonHitEvent } from "../events/types/BloonHit";
 import { BloonPoppedEvent } from "../events/types/BloonPopped";
@@ -30,6 +31,7 @@ const getNextBloon = (
         escaped: false,
         frozenDuration: 0,
         frozenTime: 0,
+        parents: [],
       };
     }
     past += bloon.count;
@@ -124,13 +126,47 @@ export const createBloonSystem = ({
               effect: false,
             },
           });
+          if (poppedBloon.type === "red") {
+            if (state.bloons.length === 0 && state.finishedSpawning === true)
+              state.active = false;
+            eventSystem.publish<BloonDestroyedEvent>({
+              type: "BloonDestroyed",
+              payload: { bloon },
+            });
+            continue;
+          }
+          const children = getBloonChildren(poppedBloon.type);
+          for (const child of children) {
+            const childBloon: Bloon = {
+              id: createBloonId(nextId++),
+              type: child,
+              frozen: false,
+              frozenTime: 0,
+              frozenDuration: 0,
+              distance: poppedBloon.distance,
+              x: poppedBloon.x,
+              y: poppedBloon.y,
+              escaped: false,
+              parents: [poppedBloon.id, ...poppedBloon.parents],
+            };
+            state.bloons.push(childBloon);
+            eventSystem.publish<BloonCreatedEvent>({
+              type: "BloonCreated",
+              payload: childBloon,
+            });
+          }
         }
       }
 
-      if (state.bloons.length === 0 && state.finishedSpawning === true)
-        state.active = false;
-
-      if (poppedBloon.type === "red") return;
+      if (poppedBloon.type === "red") {
+        if (state.bloons.length === 0 && state.finishedSpawning === true)
+          state.active = false;
+        eventSystem.publish<BloonDestroyedEvent>({
+          type: "BloonDestroyed",
+          payload: { bloon: poppedBloon },
+        });
+        return;
+      }
       const children = getBloonChildren(poppedBloon.type);
       for (const child of children) {
         const childBloon: Bloon = {
@@ -143,6 +179,7 @@ export const createBloonSystem = ({
           x: poppedBloon.x,
           y: poppedBloon.y,
           escaped: false,
+          parents: [poppedBloon.id, ...poppedBloon.parents],
         };
         state.bloons.push(childBloon);
         eventSystem.publish<BloonCreatedEvent>({
@@ -242,9 +279,7 @@ export const createBloonSystem = ({
       for (const bloon of escaped) {
         eventSystem.publish<BloonEscapedEvent>({
           type: "BloonEscaped",
-          payload: {
-            bloonId: bloon.id,
-          },
+          payload: { bloon },
         });
       }
     },

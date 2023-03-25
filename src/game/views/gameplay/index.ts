@@ -41,7 +41,7 @@ export const createGameplay = ({
     pathSystem,
     towerSystem,
   });
-  const livesSystem = createLivesSystem({ eventSystem, bloonSystem });
+  const livesSystem = createLivesSystem({ eventSystem });
   const projectileSystem = createProjectileSystem({
     eventSystem,
     bloonSystem,

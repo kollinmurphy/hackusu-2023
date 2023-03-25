@@ -1,8 +1,8 @@
 import { BloonSystem } from "./bloons";
 import rounds from "./bloons/rounds.json";
 import { EventSystem } from "./events";
+import { BloonDestroyedEvent } from "./events/types/BloonDestroyed";
 import { BloonEscapedEvent } from "./events/types/BloonEscaped";
-import { BloonPoppedEvent } from "./events/types/BloonPopped";
 import { StageClearedEvent } from "./events/types/StageCleared";
 import { StageStartedEvent } from "./events/types/StageStarted";
 import { MouseSystem } from "./mouse";
@@ -38,8 +38,8 @@ export const createRoundSystem = ({
     }
   };
 
-  eventSystem.subscribe<BloonPoppedEvent>({
-    type: "BloonPopped",
+  eventSystem.subscribe<BloonDestroyedEvent>({
+    type: "BloonDestroyed",
     callback: handleCheckStageCleared,
   });
 

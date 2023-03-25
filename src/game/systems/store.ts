@@ -256,6 +256,15 @@ export const createStoreSystem = ({
     box: upgrade0,
     type: "hover",
     in: () => {
+      if (
+        !state.selectedTower ||
+        moneySystem.getMoney() <
+          towerUpgrades[state.selectedTower.type][0].cost ||
+        state.selectedTower.upgrades
+          .map((u) => u.key)
+          .includes(towerUpgrades[state.selectedTower.type][0].key)
+      )
+        return;
       state.upgradeHover = 0;
     },
     out: () => {
@@ -290,6 +299,15 @@ export const createStoreSystem = ({
     box: upgrade1,
     type: "hover",
     in: () => {
+      if (
+        !state.selectedTower ||
+        moneySystem.getMoney() <
+          towerUpgrades[state.selectedTower.type][1].cost ||
+        state.selectedTower.upgrades
+          .map((u) => u.key)
+          .includes(towerUpgrades[state.selectedTower.type][1].key)
+      )
+        return;
       state.upgradeHover = 1;
     },
     out: () => {

@@ -1,5 +1,4 @@
 import { BloonType } from "../types/bloon";
-import { BloonSystem } from "./bloons";
 import { EventSystem } from "./events";
 import { BloonEscapedEvent } from "./events/types/BloonEscaped";
 
@@ -21,22 +20,16 @@ const mapBloonTypeToLives = (type: BloonType) => {
 
 export const createLivesSystem = ({
   eventSystem,
-  bloonSystem,
 }: {
   eventSystem: EventSystem;
-  bloonSystem: BloonSystem;
 }) => {
   let lives = 40;
 
   eventSystem.subscribe<BloonEscapedEvent>({
     type: "BloonEscaped",
     callback: (event) => {
-      const bloon = bloonSystem.getBloon(event.payload.bloonId);
-      if (!bloon) {
-        lives -= 1;
-        return;
-      }
-      lives -= mapBloonTypeToLives(bloon.type);
+      const l = mapBloonTypeToLives(event.payload.bloon.type);
+      lives -= l;
     },
   });
 

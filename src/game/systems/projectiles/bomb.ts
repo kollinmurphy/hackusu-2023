@@ -52,7 +52,7 @@ export const createBomb = ({
       type: tower.type,
       explodeRadius: tower.explodeRadius,
       pierce: tower.pierce || 0,
-      pierced: 0,
+      pierced: [],
     },
   ];
 };
