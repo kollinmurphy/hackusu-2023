@@ -1,8 +1,10 @@
 import { createTowerId, Tower } from "../../types/Tower";
 import { EventSystem } from "../events";
 import { TowerPlacedEvent } from "../events/types/TowerPlaced";
+import { TowerSelectedEvent } from "../events/types/TowerSelected";
 import { getTowerCooldown } from "./cooldown";
 import { getTowerRange } from "./range";
+import { getTowerSize } from "./size";
 
 export const createTowerSystem = ({
   eventSystem,
@@ -11,8 +13,10 @@ export const createTowerSystem = ({
 }) => {
   const state: {
     towers: Tower[];
+    selectedTower: Tower | null;
   } = {
     towers: [],
+    selectedTower: null,
   };
 
   eventSystem.subscribe<TowerPlacedEvent>({
@@ -33,12 +37,39 @@ export const createTowerSystem = ({
     },
   });
 
+  eventSystem.subscribe<TowerSelectedEvent>({
+    type: "TowerSelected",
+    callback: (event) => {
+      state.selectedTower = event.payload.tower;
+    },
+  });
+
   return {
     getTowers: () => state.towers,
     update: (deltaTime: number) => {
       for (const tower of state.towers) {
         tower.animation += deltaTime * 2.5;
       }
+    },
+    handleSelectTower: ({ x, y }: { x: number; y: number }) => {
+      const tower = state.towers.find((tower) => {
+        const size = getTowerSize(tower.type);
+        return (
+          x > tower.position.x - size.width / 2 &&
+          x < tower.position.x + size.width / 2 &&
+          y > tower.position.y - size.height / 2 &&
+          y < tower.position.y + size.height / 2
+        );
+      });
+      if (tower?.id === state.selectedTower?.id)
+        return eventSystem.publish<TowerSelectedEvent>({
+          type: "TowerSelected",
+          payload: { tower: null },
+        });
+      eventSystem.publish<TowerSelectedEvent>({
+        type: "TowerSelected",
+        payload: { tower: tower || null },
+      });
     },
     canPlaceTower: ({
       x,

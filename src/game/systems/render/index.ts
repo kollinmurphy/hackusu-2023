@@ -37,8 +37,6 @@ export const createRenderSystem = ({
       renderMap({ context, canvas, pathSystem });
       for (const bloon of bloonSystem.getBloons())
         renderBloon({ bloon, context });
-      for (const tower of towerSystem.getTowers())
-        renderTower({ tower, context });
       renderStore({
         context,
         canvas,
@@ -53,6 +51,8 @@ export const createRenderSystem = ({
           canvas,
         }),
       });
+      for (const tower of towerSystem.getTowers())
+        renderTower({ tower, context });
     },
   };
 };

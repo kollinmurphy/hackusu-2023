@@ -3,7 +3,6 @@ import { MoneySystem } from "../money";
 import { RoundSystem } from "../round";
 import { StoreSystem } from "../store";
 import { Textures } from "../textures";
-import { getTowerSize } from "../towers/size";
 import { renderTower } from "./tower";
 
 export const getStoreStartX = () => 780;
@@ -67,19 +66,12 @@ const renderPlacingTower = ({
   const tower = storeSystem.getPlacingTowerDetails();
   if (!tower) return;
 
-  const size = getTowerSize(tower.type);
   context.save();
   context.fillStyle = canPlace
     ? "rgba(0, 255, 0, 0.5)"
     : "rgba(255, 0, 0, 0.5)";
   context.beginPath();
-  context.arc(
-    tower.position.x,
-    tower.position.y,
-    size.width * 5,
-    0,
-    Math.PI * 2
-  );
+  context.arc(tower.position.x, tower.position.y, tower.range, 0, Math.PI * 2);
   context.closePath();
   context.fill();
   context.restore();
@@ -88,6 +80,25 @@ const renderPlacingTower = ({
     context,
     tower,
   });
+};
+
+const renderSelectedTower = ({
+  context,
+  storeSystem,
+}: {
+  context: CanvasRenderingContext2D;
+  storeSystem: StoreSystem;
+}) => {
+  const tower = storeSystem.getSelectedTower();
+  if (!tower) return;
+
+  context.save();
+  context.fillStyle = "rgba(255, 255, 255, 0.4)";
+  context.beginPath();
+  context.arc(tower.position.x, tower.position.y, tower.range, 0, Math.PI * 2);
+  context.closePath();
+  context.fill();
+  context.restore();
 };
 
 export const renderStore = ({
@@ -108,6 +119,12 @@ export const renderStore = ({
   canPlaceTower: boolean;
 }) => {
   context.save();
+
+  renderSelectedTower({
+    context,
+    storeSystem,
+  });
+
   context.fillStyle = "rgba(255, 255, 255, 0.5)";
 
   context.beginPath();

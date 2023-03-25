@@ -1,6 +1,7 @@
 import { createTowerId, Tower, TowerType } from "../types/Tower";
 import { EventSystem } from "./events";
 import { TowerPlacedEvent } from "./events/types/TowerPlaced";
+import { TowerSelectedEvent } from "./events/types/TowerSelected";
 import { KeyboardSystem } from "./keyboard";
 import { MoneySystem } from "./money";
 import { BoundingCircle, MouseSystem } from "./mouse";
@@ -8,6 +9,7 @@ import { PathSystem } from "./paths";
 import { getStoreStartX, getTowerIconDetails } from "./render/store";
 import { TowerSystem } from "./towers";
 import { getTowerCost } from "./towers/cost";
+import { getTowerRange } from "./towers/range";
 import { getTowerSize } from "./towers/size";
 
 export const createStoreSystem = ({
@@ -29,9 +31,11 @@ export const createStoreSystem = ({
 }) => {
   const state: {
     placingTower: Tower | null;
+    selectedTower: Tower | null;
     position: { x: number; y: number };
   } = {
     placingTower: null,
+    selectedTower: null,
     position: { x: 0, y: 0 },
   };
 
@@ -67,6 +71,13 @@ export const createStoreSystem = ({
     },
   });
 
+  eventSystem.subscribe<TowerSelectedEvent>({
+    type: "TowerSelected",
+    callback: (event) => {
+      state.selectedTower = event.payload.tower;
+    },
+  });
+
   mouseSystem.subscribe({
     type: "click",
     box: {
@@ -77,7 +88,7 @@ export const createStoreSystem = ({
       height: canvas.height,
     },
     callback: (x, y) => {
-      if (!state.placingTower) return;
+      if (!state.placingTower) return towerSystem.handleSelectTower({ x, y });
       const size = getTowerSize(state.placingTower?.type ?? "dartMonkey");
       if (
         !pathSystem.canPlaceTower({
@@ -139,7 +150,7 @@ export const createStoreSystem = ({
         position: { x: 0, y: 0 },
         cooldown: 0,
         id: createTowerId(),
-        range: 0,
+        range: getTowerRange(tower),
         rotation: 0,
         animation: 0,
       };
@@ -194,6 +205,7 @@ export const createStoreSystem = ({
         position: state.position,
       };
     },
+    getSelectedTower: (): Tower | null => state.selectedTower,
     update: (deltaTime: number) => {
       if (!state.placingTower) return;
       state.placingTower.animation += deltaTime;

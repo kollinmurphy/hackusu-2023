@@ -9,7 +9,7 @@ export const getTowerSize = (
     case "tack":
       return { width: 64, height: 64 };
     case "ice":
-      return { width: 32, height: 32 };
+      return { width: 48, height: 48 };
     case "bomb":
       return { width: 56, height: 56 };
     case "superMonkey":
