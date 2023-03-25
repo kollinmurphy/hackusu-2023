@@ -1,8 +1,9 @@
 import { createBloonSystem } from "../../systems/bloons";
 import { createEventSystem } from "../../systems/events";
+import { createKeyboardSystem } from "../../systems/keyboardSystem";
 import { createLivesSystem } from "../../systems/livesSystem";
 import { createMoneySystem } from "../../systems/money";
-import { createMouseManager, MouseManager } from "../../systems/mouseInput";
+import { createMouseSystem } from "../../systems/mouseSystem";
 import { createPathSystem } from "../../systems/paths";
 import { createRenderSystem } from "../../systems/render";
 import { createRoundSystem } from "../../systems/roundSystem";
@@ -16,7 +17,8 @@ export const createGameplay = ({
   canvas: HTMLCanvasElement;
   context: CanvasRenderingContext2D;
 }): GameView => {
-  const mouseSystem: MouseManager = createMouseManager({ canvas });
+  const mouseSystem = createMouseSystem({ canvas });
+  const keyboardSystem = createKeyboardSystem();
   const eventSystem = createEventSystem();
   const pathSystem = createPathSystem({ type: "original" });
   const bloonSystem = createBloonSystem({ eventSystem, pathSystem });
@@ -26,7 +28,11 @@ export const createGameplay = ({
     bloonSystem,
   });
   const moneySystem = createMoneySystem({ eventSystem });
-  const storeSystem = createStoreSystem({ moneySystem, mouseSystem });
+  const storeSystem = createStoreSystem({
+    moneySystem,
+    mouseSystem,
+    keyboardSystem,
+  });
   const livesSystem = createLivesSystem({ eventSystem, bloonSystem });
   const renderSystem = createRenderSystem({
     bloonSystem,
@@ -41,8 +47,9 @@ export const createGameplay = ({
 
   return {
     update: (deltaTime) => {
+      keyboardSystem.update();
       mouseSystem.update();
-      storeSystem.update();
+      roundSystem.update(deltaTime);
       bloonSystem.update(deltaTime);
     },
     render: () => {

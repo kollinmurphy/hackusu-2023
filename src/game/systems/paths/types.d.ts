@@ -12,4 +12,11 @@ export type Path = {
     y: number;
     completed: boolean;
   };
+  canPlaceTower: (input: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    canvas: HTMLCanvasElement;
+  }) => boolean;
 };

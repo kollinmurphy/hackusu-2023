@@ -39,6 +39,7 @@ export const createRenderSystem = ({
         moneySystem,
         roundSystem,
         livesSystem,
+        pathSystem,
       });
     },
   };

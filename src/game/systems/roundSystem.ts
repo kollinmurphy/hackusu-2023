@@ -5,7 +5,9 @@ import { BloonEscapedEvent } from "./events/types/BloonEscaped";
 import { BloonPoppedEvent } from "./events/types/BloonPopped";
 import { StageClearedEvent } from "./events/types/StageCleared";
 import { StageStartedEvent } from "./events/types/StageStarted";
-import { MouseManager } from "./mouseInput";
+import { MouseSystem } from "./mouseSystem";
+
+const ANIMATION_LENGTH = 1000;
 
 export const createRoundSystem = ({
   eventSystem,
@@ -13,12 +15,13 @@ export const createRoundSystem = ({
   bloonSystem,
 }: {
   eventSystem: EventSystem;
-  mouseSystem: MouseManager;
+  mouseSystem: MouseSystem;
   bloonSystem: BloonSystem;
 }) => {
   const state = {
     round: 1,
     active: false,
+    buttonAnimation: 0,
   };
 
   const handleCheckStageCleared = () => {
@@ -67,6 +70,22 @@ export const createRoundSystem = ({
   return {
     isActive: () => state.active,
     getRound: () => state.round,
+    update: (deltaTime: number) => {
+      if (state.active) {
+        state.buttonAnimation = 0;
+        return;
+      }
+      state.buttonAnimation += deltaTime;
+      if (state.buttonAnimation > ANIMATION_LENGTH) {
+        state.buttonAnimation -= ANIMATION_LENGTH;
+      }
+    },
+    getAnimation: () => {
+      const half = ANIMATION_LENGTH / 2;
+      const progress = state.buttonAnimation / half;
+      if (progress < 1) return progress;
+      return 2 - progress;
+    },
   };
 };
 
