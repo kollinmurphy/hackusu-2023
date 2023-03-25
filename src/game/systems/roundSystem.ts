@@ -1,4 +1,5 @@
 import { BloonSystem } from "./bloons";
+import rounds from "./bloons/rounds.json";
 import { EventSystem } from "./events";
 import { BloonEscapedEvent } from "./events/types/BloonEscaped";
 import { BloonPoppedEvent } from "./events/types/BloonPopped";
@@ -28,6 +29,7 @@ export const createRoundSystem = ({
         type: "StageCleared",
         payload: {
           stage: state.round,
+          message: rounds.rounds[state.round - 1].message,
         },
       });
     }

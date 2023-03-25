@@ -1,0 +1,74 @@
+{
+  "rounds": [
+    {
+      "num": 1,
+      "message": "",
+      "bloons": [
+        { "type": "red", "count": 12 }
+      ]
+    },
+    {
+      "num": 2,
+      "message": "That was too easy, press 'Start Round' to play the next round.",
+      "bloons": [
+        { "type": "red", "count": 25 }
+      ]
+    },
+    {
+      "num": 3,
+      "message": "Still super easy, you didn't miss any did you?",
+      "bloons": [
+        { "type": "red", "count": 12 },
+        { "type": "blue", "count": 2 },
+        { "type": "red", "count": 12 },
+        { "type": "blue", "count": 3 }
+      ]
+    },
+    {
+      "num": 4,
+      "message": "Blue bloons move faster and have red bloons inside them.",
+      "bloons": [
+        { "type": "red", "count": 5 },
+        { "type": "blue", "count": 12 },
+        { "type": "red", "count": 5 },
+        { "type": "blue", "count": 12 }
+      ]
+    },
+    {
+      "num": 5,
+      "message": "Remember to spend your money.",
+      "bloons": [
+        { "type": "red", "count": 15 },
+        { "type": "blue", "count": 10 },
+        { "type": "red", "count": 15 },
+        { "type": "blue", "count": 15 }
+      ]
+    },
+    {
+      "num": 6,
+      "message": "Green bloons move even faster and have blue bloons inside them!",
+      "bloons": [
+        { "type": "green", "count": 15 }
+      ]
+    },
+    {
+      "num": 7,
+      "message": "Lots of blue ones coming up. Hope you're ready...",
+      "bloons": [
+        { "type": "blue", "count": 75 }
+      ]
+    },
+    {
+      "num": 8,
+      "message": "The dart tower piercing upgrade allows darts to pop up to 2 bloons each.",
+      "bloons": [
+        { "type": "red", "count": 20 },
+        { "type": "blue", "count": 30 },
+        { "type": "red", "count": 30 },
+        { "type": "blue", "count": 20 },
+        { "type": "red", "count": 20 },
+        { "type": "blue", "count": 20 }
+      ]
+    }
+  ]
+}

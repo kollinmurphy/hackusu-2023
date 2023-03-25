@@ -1,11 +1,38 @@
-import { Bloon, BloonType, createBloonId } from "../types/bloon";
-import { EventSystem } from "./events";
-import { BloonCreatedEvent } from "./events/types/BloonCreated";
-import { BloonEscapedEvent } from "./events/types/BloonEscaped";
-import { BloonHitEvent } from "./events/types/BloonHit";
-import { BloonPoppedEvent } from "./events/types/BloonPopped";
-import { StageStartedEvent } from "./events/types/StageStarted";
-import { PathSystem } from "./paths";
+import { Bloon, BloonId, BloonType, createBloonId } from "../../types/bloon";
+import { EventSystem } from "../events";
+import { BloonCreatedEvent } from "../events/types/BloonCreated";
+import { BloonEscapedEvent } from "../events/types/BloonEscaped";
+import { BloonHitEvent } from "../events/types/BloonHit";
+import { BloonPoppedEvent } from "../events/types/BloonPopped";
+import { StageStartedEvent } from "../events/types/StageStarted";
+import { PathSystem } from "../paths";
+import rounds from "./rounds.json";
+
+const getNextBloon = (
+  stage: number,
+  bloonsCreated: number,
+  id: BloonId
+): Bloon | null => {
+  const round = rounds.rounds[stage - 1].bloons;
+  let past = 0;
+  for (const bloon of round) {
+    if (bloon.count + past > bloonsCreated) {
+      return {
+        type: bloon.type as BloonType,
+        id,
+        x: 0,
+        y: 0,
+        distance: 0,
+        frozen: false,
+        escaped: false,
+        frozenDuration: 0,
+        frozenTime: 0,
+      };
+    }
+    past += bloon.count;
+  }
+  return null;
+};
 
 const getBloonChildren = (type: BloonType): BloonType[] => {
   switch (type) {
@@ -25,6 +52,7 @@ const getBloonChildren = (type: BloonType): BloonType[] => {
 
 // const SPEED_FACTOR = 0.12;
 const SPEED_FACTOR = 0.3;
+const BLOON_INTERVAL = 250;
 
 const getBloonSpeed = (bloon: Bloon) => {
   if (bloon.frozen) return 0;
@@ -54,7 +82,8 @@ export const createBloonSystem = ({
 
   const state = {
     bloons: [] as Bloon[],
-    roundTime: 0,
+    bloonTime: 0,
+    bloonsCreated: 0,
     round: 0,
     active: false,
   };
@@ -64,7 +93,8 @@ export const createBloonSystem = ({
     callback: (event) => {
       state.active = true;
       state.round = event.payload.stage;
-      state.roundTime = 0;
+      state.bloonTime = 0;
+      state.bloonsCreated = 0;
     },
   });
 
@@ -114,26 +144,21 @@ export const createBloonSystem = ({
     getBloons: () => state.bloons,
     update: (deltaTime: number) => {
       if (!state.active) return;
-      
-      state.roundTime += deltaTime;
-      if (state.roundTime > 1000) {
-        state.roundTime -= 1000;
-        const bloon: Bloon = {
-          id: createBloonId(nextId++),
-          type: "red",
-          frozen: false,
-          frozenTime: 0,
-          frozenDuration: 0,
-          distance: 0,
-          x: 0,
-          y: 0,
-          escaped: false,
-        };
-        state.bloons.push(bloon);
-        eventSystem.publish<BloonCreatedEvent>({
-          type: "BloonCreated",
-          payload: bloon,
-        });
+
+      state.bloonTime += deltaTime;
+      if (state.bloonTime > BLOON_INTERVAL) {
+        const next = getNextBloon(state.round, state.bloonsCreated, createBloonId(nextId++));
+        if (next) {
+          state.bloonTime -= BLOON_INTERVAL;
+          state.bloons.push(next);
+          state.bloonsCreated++;
+          eventSystem.publish<BloonCreatedEvent>({
+            type: "BloonCreated",
+            payload: next,
+          });
+        } else {
+          state.bloonTime = -Infinity;
+        }
       }
 
       for (const bloon of state.bloons) {
