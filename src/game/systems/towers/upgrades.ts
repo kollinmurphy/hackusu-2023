@@ -32,7 +32,7 @@ export const towerUpgrades = {
       key: "bigger-bombs",
       label: "Bigger Bombs",
       cost: 650,
-      explodeRadius: 20,
+      explodeRadius: 50,
     },
     {
       key: "extra-range-bombs",
@@ -46,13 +46,13 @@ export const towerUpgrades = {
       key: "long-freeze-time",
       label: "Long freeze time",
       cost: 450,
-      freezeTime: 200,
+      freezeTime: 1000,
     },
     {
       key: "wide-freeze-radius",
       label: "Wide freeze radius",
       cost: 300,
-      range: 15,
+      range: 20,
     },
   ],
   superMonkey: [
