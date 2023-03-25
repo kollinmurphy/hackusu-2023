@@ -50,6 +50,7 @@ export const createBomb = ({
       range: tower.range,
       elapsed: 0,
       type: tower.type,
+      explodeRadius: tower.explodeRadius,
     },
   ];
 };

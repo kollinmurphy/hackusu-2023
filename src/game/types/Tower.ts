@@ -12,6 +12,7 @@ export type Tower = {
   timeSinceFire: number;
   animation: number;
   freezeTime?: number;
+  explodeRadius?: number;
 };
 
 let nextId = 1;

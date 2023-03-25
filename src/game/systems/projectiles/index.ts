@@ -87,7 +87,6 @@ export const createProjectileSystem = ({
               bloon.frozenTime = 0;
             });
           }
-
           continue;
         }
 

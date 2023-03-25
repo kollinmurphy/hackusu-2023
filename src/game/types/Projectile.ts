@@ -19,5 +19,5 @@ export type Projectile = {
   range: number;
   elapsed: number;
   freezeTime?: number;
-  // target: BloonId;
+  explodeRadius?: number;
 };

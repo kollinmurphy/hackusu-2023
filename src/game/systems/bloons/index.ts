@@ -51,6 +51,7 @@ export const createBloonSystem = ({
     bloons: [] as Bloon[],
     bloonTime: 0,
     bloonsCreated: 0,
+    finishedSpawning: false,
     round: 0,
     active: false,
   };
@@ -78,14 +79,42 @@ export const createBloonSystem = ({
         ...state.bloons.slice(index + 1),
       ];
 
-      if (state.bloons.length === 0) state.active = false;
-
       eventSystem.publish<BloonPoppedEvent>({
         type: "BloonPopped",
         payload: {
           bloon: poppedBloon,
         },
       });
+
+      if (event.payload.projectile.type === "bomb") {
+        const nearbyBloons = state.bloons
+          .filter((bloon) => {
+            return (
+              Math.sqrt(
+                Math.pow(bloon.x - poppedBloon.x, 2) +
+                  Math.pow(bloon.y - poppedBloon.y, 2)
+              ) < 100
+            );
+          })
+          .filter((bloon) => bloon.type !== "black");
+        for (const bloon of nearbyBloons) {
+          const index = state.bloons.findIndex((b) => b.id === bloon.id);
+          if (index === -1) continue;
+          state.bloons = [
+            ...state.bloons.slice(0, index),
+            ...state.bloons.slice(index + 1),
+          ];
+          eventSystem.publish<BloonPoppedEvent>({
+            type: "BloonPopped",
+            payload: {
+              bloon,
+            },
+          });
+        }
+      }
+
+      if (state.bloons.length === 0 && state.finishedSpawning === true)
+        state.active = false;
 
       if (poppedBloon.type === "red") return;
       const children = getBloonChildren(poppedBloon.type);
@@ -153,6 +182,7 @@ export const createBloonSystem = ({
           });
         } else {
           state.bloonTime = -Infinity;
+          state.finishedSpawning = true;
         }
       }
 

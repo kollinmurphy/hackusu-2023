@@ -40,6 +40,7 @@ export const createTowerSystem = ({
         animation: 0,
         timeSinceFire: cooldown,
         freezeTime: event.payload.type === "ice" ? 2000 : undefined,
+        explodeRadius: event.payload.type === "bomb" ? 100 : undefined,
       });
     },
   });
