@@ -1,5 +1,7 @@
 import { createTowerId, Tower } from "../../types/Tower";
+import { BloonSystem } from "../bloons";
 import { EventSystem } from "../events";
+import { TowerFired } from "../events/types/TowerFired";
 import { TowerPlacedEvent } from "../events/types/TowerPlaced";
 import { TowerSelectedEvent } from "../events/types/TowerSelected";
 import { getTowerCooldown } from "./cooldown";
@@ -8,8 +10,10 @@ import { getTowerSize } from "./size";
 
 export const createTowerSystem = ({
   eventSystem,
+  bloonSystem,
 }: {
   eventSystem: EventSystem;
+  bloonSystem: BloonSystem;
 }) => {
   const state: {
     towers: Tower[];
@@ -22,6 +26,7 @@ export const createTowerSystem = ({
   eventSystem.subscribe<TowerPlacedEvent>({
     type: "TowerPlaced",
     callback: (event) => {
+      const cooldown = getTowerCooldown(event.payload.type);
       state.towers.push({
         id: createTowerId(),
         type: event.payload.type,
@@ -29,10 +34,11 @@ export const createTowerSystem = ({
           x: event.payload.x,
           y: event.payload.y,
         },
-        cooldown: getTowerCooldown(event.payload.type),
+        cooldown,
         range: getTowerRange(event.payload.type),
         rotation: 0,
         animation: 0,
+        timeSinceFire: cooldown,
       });
     },
   });
@@ -49,6 +55,28 @@ export const createTowerSystem = ({
     update: (deltaTime: number) => {
       for (const tower of state.towers) {
         tower.animation += deltaTime * 2.5;
+        tower.timeSinceFire += deltaTime;
+        if (tower.timeSinceFire >= tower.cooldown) {
+          const target = bloonSystem.getLastBloonInRadius({
+            x: tower.position.x,
+            y: tower.position.y,
+            radius: tower.range,
+          });
+          if (target) {
+            tower.timeSinceFire = 0; // need to reset to 0 to prevent building up of shots
+            tower.rotation = Math.atan2(
+              target.y - tower.position.y,
+              target.x - tower.position.x
+            );
+            eventSystem.publish<TowerFired>({
+              type: "TowerFired",
+              payload: {
+                tower,
+                bloon: target,
+              },
+            });
+          }
+        }
       }
     },
     handleSelectTower: ({ x, y }: { x: number; y: number }) => {

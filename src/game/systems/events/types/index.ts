@@ -4,6 +4,7 @@ import { BloonHitEvent } from "./BloonHit";
 import { BloonPoppedEvent } from "./BloonPopped";
 import { StageClearedEvent } from "./StageCleared";
 import { StageStartedEvent } from "./StageStarted";
+import { TowerFired } from "./TowerFired";
 import { TowerPlacedEvent } from "./TowerPlaced";
 import { TowerSelectedEvent } from "./TowerSelected";
 
@@ -23,7 +24,8 @@ export type BTDEvent =
   | BloonEscapedEvent
   | BloonHitEvent
   | TowerPlacedEvent
-  | TowerSelectedEvent;
+  | TowerSelectedEvent
+  | TowerFired;
 
 export type EventCallbackEntry = {
   id: EventCallbackId;

@@ -6,7 +6,9 @@ import { BloonHitEvent } from "../events/types/BloonHit";
 import { BloonPoppedEvent } from "../events/types/BloonPopped";
 import { StageStartedEvent } from "../events/types/StageStarted";
 import { PathSystem } from "../paths";
+import { getBloonChildren } from "./children";
 import rounds from "./rounds.json";
+import { getBloonSpeed } from "./speed";
 
 const getNextBloon = (
   stage: number,
@@ -34,42 +36,7 @@ const getNextBloon = (
   return null;
 };
 
-const getBloonChildren = (type: BloonType): BloonType[] => {
-  switch (type) {
-    case "red":
-      return [];
-    case "blue":
-      return ["red"];
-    case "green":
-      return ["blue"];
-    case "yellow":
-      return ["green"];
-    case "white":
-    case "black":
-      return ["yellow", "yellow"];
-  }
-};
-
-// const SPEED_FACTOR = 0.12;
-const SPEED_FACTOR = 0.3;
 const BLOON_INTERVAL = 250;
-
-const getBloonSpeed = (bloon: Bloon) => {
-  if (bloon.frozen) return 0;
-  switch (bloon.type) {
-    case "red":
-      return 1;
-    case "blue":
-      return 1.5;
-    case "green":
-      return 1.7;
-    case "yellow":
-      return 3;
-    case "white":
-    case "black":
-      return 1.5;
-  }
-};
 
 export const createBloonSystem = ({
   eventSystem,
@@ -102,45 +69,66 @@ export const createBloonSystem = ({
     type: "BloonHit",
     callback: (event) => {
       const index = state.bloons.findIndex(
-        (bloon) => bloon.id !== event.payload.bloonId
+        (bloon) => bloon.id === event.payload.bloon.id
       );
       if (index === -1) return;
       const poppedBloon = state.bloons[index];
-      state.bloons = state.bloons.splice(index, 1);
+      state.bloons = [
+        ...state.bloons.slice(0, index),
+        ...state.bloons.slice(index + 1),
+      ];
 
-      if (state.bloons.length === 0) {
-        state.active = false;
-      }
+      if (state.bloons.length === 0) state.active = false;
 
       eventSystem.publish<BloonPoppedEvent>({
         type: "BloonPopped",
         payload: {
-          bloonId: poppedBloon.id,
+          bloon: poppedBloon,
         },
       });
 
       if (poppedBloon.type === "red") return;
       const children = getBloonChildren(poppedBloon.type);
       for (const child of children) {
+        const childBloon: Bloon = {
+          id: createBloonId(nextId++),
+          type: child,
+          frozen: false,
+          frozenTime: 0,
+          frozenDuration: 0,
+          distance: poppedBloon.distance,
+          x: poppedBloon.x,
+          y: poppedBloon.y,
+          escaped: false,
+        };
+        state.bloons.push(childBloon);
         eventSystem.publish<BloonCreatedEvent>({
           type: "BloonCreated",
-          payload: {
-            id: createBloonId(nextId++),
-            type: child,
-            frozen: false,
-            frozenTime: 0,
-            frozenDuration: 0,
-            distance: poppedBloon.distance,
-            x: 0,
-            y: 0,
-            escaped: false,
-          },
+          payload: childBloon,
         });
       }
     },
   });
 
   return {
+    getLastBloonInRadius: ({
+      x,
+      y,
+      radius,
+    }: {
+      x: number;
+      y: number;
+      radius: number;
+    }): Bloon | null => {
+      for (let i = state.bloons.length - 1; i >= 0; i--) {
+        const bloon = state.bloons[i];
+        const dx = bloon.x - x;
+        const dy = bloon.y - y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        if (distance < radius) return bloon;
+      }
+      return null;
+    },
     getBloons: () => state.bloons,
     getBloon: (id: BloonId) => {
       return state.bloons.find((bloon) => bloon.id === id);
@@ -169,7 +157,7 @@ export const createBloonSystem = ({
       }
 
       for (const bloon of state.bloons) {
-        bloon.distance += getBloonSpeed(bloon) * deltaTime * SPEED_FACTOR;
+        bloon.distance += getBloonSpeed(bloon) * deltaTime;
         const coordinates = pathSystem.computePoint(bloon.distance);
         bloon.x = coordinates.x;
         bloon.y = coordinates.y;
@@ -188,7 +176,7 @@ export const createBloonSystem = ({
         { bloons: [], escaped: [] }
       );
 
-      state.bloons = bloons;
+      state.bloons = bloons.sort((a, b) => a.distance - b.distance);
       for (const bloon of escaped) {
         eventSystem.publish<BloonEscapedEvent>({
           type: "BloonEscaped",

@@ -1,9 +1,11 @@
 import { BaseEvent } from ".";
-import { BloonId } from "../../../types/bloon";
+import { Bloon } from "../../../types/bloon";
+import { Projectile } from "../../../types/Projectile";
 
 export type BloonHitEvent = BaseEvent<
   "BloonHit",
   {
-    bloonId: BloonId;
+    bloon: Bloon;
+    projectile: Projectile;
   }
 >;

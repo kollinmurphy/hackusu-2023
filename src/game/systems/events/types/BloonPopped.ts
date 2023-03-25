@@ -1,4 +1,4 @@
 import { BaseEvent } from ".";
-import { BloonId } from "../../../types/bloon";
+import { Bloon } from "../../../types/bloon";
 
-export type BloonPoppedEvent = BaseEvent<"BloonPopped", { bloonId: BloonId }>;
+export type BloonPoppedEvent = BaseEvent<"BloonPopped", { bloon: Bloon }>;

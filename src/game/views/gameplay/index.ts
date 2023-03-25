@@ -5,6 +5,7 @@ import { createLivesSystem } from "../../systems/lives";
 import { createMoneySystem } from "../../systems/money";
 import { createMouseSystem } from "../../systems/mouse";
 import { createPathSystem } from "../../systems/paths";
+import { createProjectileSystem } from "../../systems/projectiles";
 import { createRenderSystem } from "../../systems/render";
 import { createRoundSystem } from "../../systems/round";
 import { createStoreSystem } from "../../systems/store";
@@ -29,7 +30,7 @@ export const createGameplay = ({
     bloonSystem,
   });
   const moneySystem = createMoneySystem({ eventSystem });
-  const towerSystem = createTowerSystem({ eventSystem });
+  const towerSystem = createTowerSystem({ eventSystem, bloonSystem });
   const storeSystem = createStoreSystem({
     moneySystem,
     mouseSystem,
@@ -40,6 +41,11 @@ export const createGameplay = ({
     towerSystem,
   });
   const livesSystem = createLivesSystem({ eventSystem, bloonSystem });
+  const projectileSystem = createProjectileSystem({
+    eventSystem,
+    bloonSystem,
+    pathSystem,
+  });
   const renderSystem = createRenderSystem({
     bloonSystem,
     moneySystem,
@@ -50,6 +56,7 @@ export const createGameplay = ({
     roundSystem,
     livesSystem,
     towerSystem,
+    projectileSystem,
   });
 
   return {
@@ -60,6 +67,7 @@ export const createGameplay = ({
       bloonSystem.update(deltaTime);
       towerSystem.update(deltaTime);
       storeSystem.update(deltaTime);
+      projectileSystem.update(deltaTime);
     },
     render: () => {
       renderSystem.render();

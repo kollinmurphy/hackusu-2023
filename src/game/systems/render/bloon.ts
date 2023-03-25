@@ -11,8 +11,8 @@ export const renderBloon = (props: {
   const texture = Textures().bloons[props.bloon.type];
   props.context.drawImage(
     texture,
-    props.bloon.x,
-    props.bloon.y,
+    props.bloon.x - bloonWidth / 2,
+    props.bloon.y - bloonHeight / 2,
     bloonWidth,
     bloonHeight
   );
