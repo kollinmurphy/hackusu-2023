@@ -1,6 +1,9 @@
 import { BloonCreatedEvent } from "./BloonCreated";
+import { BloonEscapedEvent } from "./BloonEscaped";
+import { BloonHitEvent } from "./BloonHit";
 import { BloonPoppedEvent } from "./BloonPopped";
 import { StageClearedEvent } from "./StageCleared";
+import { StageStartedEvent } from "./StageStarted";
 
 export type BaseEvent<
   Type extends string,
@@ -10,7 +13,13 @@ export type BaseEvent<
   payload: Payload;
 };
 
-export type BTDEvent = BloonCreatedEvent | BloonPoppedEvent | StageClearedEvent;
+export type BTDEvent =
+  | BloonCreatedEvent
+  | BloonPoppedEvent
+  | StageClearedEvent
+  | StageStartedEvent
+  | BloonEscapedEvent
+  | BloonHitEvent;
 
 export type EventCallbackEntry = {
   id: EventCallbackId;

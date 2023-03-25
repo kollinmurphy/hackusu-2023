@@ -4,8 +4,8 @@ import { createMoneySystem } from "../../systems/money";
 import { createMouseManager, MouseManager } from "../../systems/mouseInput";
 import { createPathSystem } from "../../systems/paths";
 import { createRenderSystem } from "../../systems/render";
+import { createRoundSystem } from "../../systems/roundSystem";
 import { createStoreSystem } from "../../systems/store";
-import { Textures } from "../../systems/textures";
 import { GameView } from "../../types/GameView";
 
 export const createGameplay = ({
@@ -15,13 +15,16 @@ export const createGameplay = ({
   canvas: HTMLCanvasElement;
   context: CanvasRenderingContext2D;
 }): GameView => {
-  const textures = Textures();
-
+  const mouseSystem: MouseManager = createMouseManager({ canvas });
   const eventSystem = createEventSystem();
   const pathSystem = createPathSystem({ type: "original" });
-  const moneySystem = createMoneySystem({ eventSystem });
   const bloonSystem = createBloonSystem({ eventSystem, pathSystem });
-  const mouseSystem: MouseManager = createMouseManager({ canvas });
+  const roundSystem = createRoundSystem({
+    eventSystem,
+    mouseSystem,
+    bloonSystem,
+  });
+  const moneySystem = createMoneySystem({ eventSystem });
   const storeSystem = createStoreSystem({ moneySystem, mouseSystem });
   const renderSystem = createRenderSystem({
     bloonSystem,
@@ -29,6 +32,8 @@ export const createGameplay = ({
     context,
     canvas,
     storeSystem,
+    pathSystem,
+    roundSystem,
   });
 
   return {
@@ -38,45 +43,6 @@ export const createGameplay = ({
       bloonSystem.update(deltaTime);
     },
     render: () => {
-      const gap = canvas.width * 0.1;
-      context.save();
-
-      pathSystem.tiles.forEach((tile) => {
-        context.save();
-        context.translate(tile.x, tile.y);
-        if (tile.orientation === "vertical") {
-          context.translate(tile.height, 0);
-          context.rotate(Math.PI / 2);
-        }
-        context.drawImage(textures.map.tile, 0, 0, tile.width, tile.height);
-        context.restore();
-      });
-
-      context.drawImage(
-        textures.map.grass,
-        -gap,
-        -gap,
-        canvas.width + gap * 2,
-        canvas.height + gap * 2
-      );
-      context.globalAlpha = 0.9;
-      context.drawImage(
-        textures.map.overlay,
-        -gap,
-        -gap,
-        canvas.width + gap * 2,
-        canvas.height + gap * 2
-      );
-      context.globalAlpha = 1;
-      context.drawImage(
-        textures.map.pathBackground,
-        -canvas.width * 0.03,
-        -canvas.height * 0.06,
-        canvas.width * 0.77,
-        canvas.height * 0.965
-      );
-      context.restore();
-
       renderSystem.render();
     },
   };

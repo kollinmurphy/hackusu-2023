@@ -11,6 +11,7 @@ export type Bloon = {
   distance: number;
   x: number;
   y: number;
+  escaped: boolean;
 }
 
 export const createBloonId = (num: number) => num as BloonId;
