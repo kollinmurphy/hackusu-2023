@@ -74,6 +74,7 @@ export const createTowerSystem = ({
       );
       if (!tower) return;
       tower.upgrades.push(event.payload.upgrade);
+      tower.cost += event.payload.upgrade.cost;
       const upgrade = event.payload.upgrade;
       if (upgrade.range) tower.range += upgrade.range * RANGE_MULTIPLIER;
       if (upgrade.freezeTime)

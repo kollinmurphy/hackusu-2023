@@ -32,7 +32,7 @@ export const towerUpgrades = {
       key: "bigger-bombs",
       label: "Bigger Bombs",
       cost: 650,
-      explodeRadius: 50,
+      explodeRadius: 100,
     },
     {
       key: "extra-range-bombs",

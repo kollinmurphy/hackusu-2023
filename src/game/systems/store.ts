@@ -301,6 +301,7 @@ export const createStoreSystem = ({
     in: () => {
       if (
         !state.selectedTower ||
+        towerUpgrades[state.selectedTower.type].length < 2 ||
         moneySystem.getMoney() <
           towerUpgrades[state.selectedTower.type][1].cost ||
         state.selectedTower.upgrades
