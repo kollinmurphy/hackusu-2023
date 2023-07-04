@@ -1,10 +1,9 @@
 import { createGame } from "./game";
-import { initializeAudio } from "../public/assets/ignore/audio";
 import { initializeTextures } from "./game/systems/textures";
 import "./style.css";
 
 (async () => {
-  await Promise.all([initializeTextures(), initializeAudio()]);
+  await Promise.all([initializeTextures()]);
 
   let previousTime = performance.now();
 

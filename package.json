@@ -1,10 +1,11 @@
 {
-  "name": "assign4",
-  "private": true,
-  "version": "0.0.0",
+  "name": "hackusu-2023",
+  "author": "Kollin Murphy",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "start": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
